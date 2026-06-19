@@ -1,6 +1,3 @@
-```python
-# utils/preprocessing.py
-
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
@@ -69,4 +66,4 @@ def preprocess_data(df: pd.DataFrame):
     )
 
     return scaled_df, scaler
-```
+
