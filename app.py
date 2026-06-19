@@ -1,9 +1,12 @@
 import streamlit as st
-from streamlit_option_menu import option_menu
 
-# =====================================================
-# KONFIGURASI HALAMAN
-# =====================================================
+from views.dashboard import show_dashboard
+from views.kelola_data import show_kelola_data
+from views.preprocessing_view import show_preprocessing
+from views.kmeans import show_kmeans
+from views.hasil import show_hasil
+from views.download import show_download
+from views.tentang import show_tentang
 
 st.set_page_config(
     page_title="Shopee Food Analytics",
@@ -12,106 +15,64 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# =====================================================
-# CSS
-# =====================================================
+# =========================
+# SESSION NAVIGATION
+# =========================
 
-with open("assets/style.css", "r", encoding="utf-8") as f:
+if "page" not in st.session_state:
+    st.session_state.page = "Dashboard"
+
+# =========================
+# LOAD CSS
+# =========================
+
+with open("assets/style.css", encoding="utf-8") as f:
     st.markdown(
         f"<style>{f.read()}</style>",
         unsafe_allow_html=True
     )
 
-# =====================================================
-# SIDEBAR CUSTOM
-# =====================================================
+# =========================
+# SIDEBAR
+# =========================
 
 with st.sidebar:
 
     st.markdown(
         """
-        <h2 style='text-align:center;'>
-            🍽️<br>
-            Shopee Food
-        </h2>
+        <h1 style='text-align:center;'>
+        🍽️
+        </h1>
+
+        <h3 style='text-align:center;margin-top:-15px'>
+        Shopee Food Analytics
+        </h3>
         """,
         unsafe_allow_html=True
     )
 
-    st.caption(
-        "K-Means Clustering Analytics"
-    )
+    st.markdown("---")
 
-    selected = option_menu(
+    if st.button("🏠 Dashboard"):
+        st.session_state.page = "Dashboard"
 
-        menu_title=None,
+    if st.button("📂 Kelola Data"):
+        st.session_state.page = "Kelola Data"
 
-        options=[
-            "Dashboard",
-            "Kelola Data",
-            "Preprocessing",
-            "K-Means",
-            "Hasil",
-            "Download",
-            "Tentang"
-        ],
+    if st.button("🧹 Preprocessing"):
+        st.session_state.page = "Preprocessing"
 
-        icons=[
-            "house-fill",
-            "database-fill",
-            "magic",
-            "bullseye",
-            "bar-chart-fill",
-            "download",
-            "info-circle-fill"
-        ],
+    if st.button("🎯 K-Means"):
+        st.session_state.page = "KMeans"
 
-        default_index=0,
+    if st.button("📈 Hasil"):
+        st.session_state.page = "Hasil"
 
-        styles={
+    if st.button("📥 Download"):
+        st.session_state.page = "Download"
 
-            "container": {
-
-                "padding": "0!important",
-
-                "background-color": "#ffffff"
-
-            },
-
-            "icon": {
-
-                "color": "#7C3AED",
-
-                "font-size": "18px"
-
-            },
-
-            "nav-link": {
-
-                "font-size": "15px",
-
-                "text-align": "left",
-
-                "margin": "8px",
-
-                "padding": "12px",
-
-                "border-radius": "12px"
-
-            },
-
-            "nav-link-selected": {
-
-                "background":
-                "linear-gradient(90deg,#7C3AED,#2563EB)",
-
-                "color": "white"
-
-            }
-
-        }
-
-    )
+    if st.button("ℹ️ Tentang"):
+        st.session_state.page = "Tentang"
 
     st.markdown("---")
 
@@ -127,51 +88,30 @@ with st.sidebar:
 
     st.progress(progress)
 
-    st.caption(f"{progress}%")
+# =========================
+# ROUTER
+# =========================
 
-# =====================================================
-# ROUTING
-# =====================================================
+page = st.session_state.page
 
-if selected == "Dashboard":
-
-    from views.dashboard import show_dashboard
-
+if page == "Dashboard":
     show_dashboard()
 
-elif selected == "Kelola Data":
-
-    from views.kelola_data import show_kelola_data
-
+elif page == "Kelola Data":
     show_kelola_data()
 
-elif selected == "Preprocessing":
-
-    from views.preprocessing_view import show_preprocessing
-
+elif page == "Preprocessing":
     show_preprocessing()
 
-elif selected == "K-Means":
-
-    from views.kmeans import show_kmeans
-
+elif page == "KMeans":
     show_kmeans()
 
-elif selected == "Hasil":
-
-    from views.hasil import show_hasil
-
+elif page == "Hasil":
     show_hasil()
 
-elif selected == "Download":
-
-    from views.download import show_download
-
+elif page == "Download":
     show_download()
 
-elif selected == "Tentang":
-
-    from views.tentang import show_tentang
-
+elif page == "Tentang":
     show_tentang()
 
