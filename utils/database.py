@@ -1,4 +1,3 @@
-```python
 import sqlite3
 from pathlib import Path
 import pandas as pd
@@ -175,4 +174,4 @@ def replace_all_data(df):
 # =====================================================
 
 create_table()
-```
+
