@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_option_menu import option_menu
 
 from views.dashboard import show_dashboard
 from views.kelola_data import show_kelola_data
@@ -8,6 +9,10 @@ from views.hasil import show_hasil
 from views.download import show_download
 from views.tentang import show_tentang
 
+# =====================================================
+# CONFIG
+# =====================================================
+
 st.set_page_config(
     page_title="Shopee Food Analytics",
     page_icon="🍽️",
@@ -15,68 +20,147 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# =========================
-# SESSION NAVIGATION
-# =========================
-
-if "page" not in st.session_state:
-    st.session_state.page = "Dashboard"
-
-# =========================
+# =====================================================
 # LOAD CSS
-# =========================
+# =====================================================
 
-with open("assets/style.css", encoding="utf-8") as f:
+with open("assets/style.css", encoding="utf-8") as css:
     st.markdown(
-        f"<style>{f.read()}</style>",
+        f"<style>{css.read()}</style>",
         unsafe_allow_html=True
     )
 
-# =========================
+# =====================================================
 # SIDEBAR
-# =========================
+# =====================================================
 
 with st.sidebar:
 
     st.markdown(
         """
-        <h1 style='text-align:center;'>
-        🍽️
+        <div style="
+            text-align:center;
+            padding:15px;
+            border-radius:18px;
+            background:white;
+            box-shadow:0px 4px 12px rgba(0,0,0,.08);
+            margin-bottom:20px;
+        ">
+
+        <h1 style="margin-bottom:0;">
+            🍽️
         </h1>
 
-        <h3 style='text-align:center;margin-top:-15px'>
-        Shopee Food Analytics
+        <h3 style="margin-top:5px;">
+            Shopee Food
         </h3>
+
+        <p style="
+            color:gray;
+            font-size:13px;
+        ">
+        Analytics Dashboard
+        </p>
+
+        </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.markdown("---")
+    selected = option_menu(
 
-    if st.button("🏠 Dashboard"):
-        st.session_state.page = "Dashboard"
+        menu_title=None,
 
-    if st.button("📂 Kelola Data"):
-        st.session_state.page = "Kelola Data"
+        options=[
 
-    if st.button("🧹 Preprocessing"):
-        st.session_state.page = "Preprocessing"
+            "Dashboard",
 
-    if st.button("🎯 K-Means"):
-        st.session_state.page = "KMeans"
+            "Kelola Data",
 
-    if st.button("📈 Hasil"):
-        st.session_state.page = "Hasil"
+            "Preprocessing",
 
-    if st.button("📥 Download"):
-        st.session_state.page = "Download"
+            "K-Means",
 
-    if st.button("ℹ️ Tentang"):
-        st.session_state.page = "Tentang"
+            "Hasil",
 
-    st.markdown("---")
+            "Download",
 
-    st.write("### Progress")
+            "Tentang"
+
+        ],
+
+        icons=[
+
+            "house-fill",
+
+            "database-fill",
+
+            "magic",
+
+            "bullseye",
+
+            "bar-chart-fill",
+
+            "download",
+
+            "info-circle-fill"
+
+        ],
+
+        default_index=0,
+
+        styles={
+
+            "container": {
+
+                "padding": "0",
+
+                "background-color": "#F8FAFC"
+
+            },
+
+            "icon": {
+
+                "color": "#7C3AED",
+
+                "font-size": "18px"
+
+            },
+
+            "nav-link": {
+
+                "font-size": "15px",
+
+                "font-weight": "600",
+
+                "text-align": "left",
+
+                "margin": "8px",
+
+                "padding": "14px",
+
+                "border-radius": "15px",
+
+                "--hover-color": "#EEF2FF"
+
+            },
+
+            "nav-link-selected": {
+
+                "background":
+                "linear-gradient(90deg,#7C3AED,#2563EB)",
+
+                "color": "white"
+
+            }
+
+        }
+
+    )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    st.markdown("### 📈 Progress")
 
     progress = 15
 
@@ -88,30 +172,30 @@ with st.sidebar:
 
     st.progress(progress)
 
-# =========================
+    st.caption(f"{progress}% Completed")
+
+# =====================================================
 # ROUTER
-# =========================
+# =====================================================
 
-page = st.session_state.page
-
-if page == "Dashboard":
+if selected == "Dashboard":
     show_dashboard()
 
-elif page == "Kelola Data":
+elif selected == "Kelola Data":
     show_kelola_data()
 
-elif page == "Preprocessing":
+elif selected == "Preprocessing":
     show_preprocessing()
 
-elif page == "KMeans":
+elif selected == "K-Means":
     show_kmeans()
 
-elif page == "Hasil":
+elif selected == "Hasil":
     show_hasil()
 
-elif page == "Download":
+elif selected == "Download":
     show_download()
 
-elif page == "Tentang":
+elif selected == "Tentang":
     show_tentang()
 
