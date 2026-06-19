@@ -102,13 +102,11 @@ def add_cluster_label(df):
 
 def cluster_summary(df):
 
-    summary = (
-        df.groupby("cluster")
+    return (
+        df.groupby("Label")
           .size()
           .reset_index(name="Jumlah Data")
     )
-
-    return summary
 
 
 # =====================================================
@@ -117,13 +115,12 @@ def cluster_summary(df):
 
 def cluster_statistics(df):
 
-    statistik = (
+    return (
         df.groupby("Label")[
             [
                 "Total_harga",
                 "Jumlah_pesanan",
                 "rata_rata_harga",
-                "waktu_persiapan_yang_diberikan",
                 "waktu_persiapan_digunakan"
             ]
         ]
@@ -131,6 +128,4 @@ def cluster_statistics(df):
         .round(2)
         .reset_index()
     )
-
-    return statistik
 
