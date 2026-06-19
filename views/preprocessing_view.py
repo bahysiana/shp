@@ -13,75 +13,74 @@ def show_preprocessing():
 
     st.title("🧹 Preprocessing Data")
 
-    st.caption(
-        "Cleaning dan StandardScaler"
+    st.write(
+        "Tahapan preprocessing meliputi pembersihan data dan "
+        "standardisasi menggunakan StandardScaler."
     )
 
     st.markdown("---")
+
+    # =====================================
+    # LOAD DATA
+    # =====================================
 
     df = get_all_data()
 
     if df.empty:
 
         st.warning(
-            "Belum ada data. Import dataset terlebih dahulu."
+            "Belum ada data. Silakan import dataset terlebih dahulu."
         )
 
         return
 
-    # =====================================================
-    # TAB
-    # =====================================================
-
-    tab1, tab2, tab3 = st.tabs([
-        "📄 Data Awal",
-        "🧹 Data Bersih",
-        "📊 StandardScaler"
-    ])
-
-    # =====================================================
+    # =====================================
     # DATA AWAL
-    # =====================================================
+    # =====================================
 
-    with tab1:
+    st.subheader("📄 Data Awal")
 
-        st.dataframe(
-            df,
-            use_container_width=True,
-            hide_index=True
-        )
+    st.dataframe(
+        df,
+        use_container_width=True,
+        hide_index=True
+    )
 
-    # =====================================================
+    st.markdown("---")
+
+    # =====================================
     # CLEANING
-    # =====================================================
+    # =====================================
 
     clean_df = clean_dataframe(df)
 
-    with tab2:
+    st.subheader("🧹 Data Setelah Cleaning")
 
-        st.dataframe(
-            clean_df,
-            use_container_width=True,
-            hide_index=True
-        )
+    st.dataframe(
+        clean_df,
+        use_container_width=True,
+        hide_index=True
+    )
 
-    # =====================================================
+    st.markdown("---")
+
+    # =====================================
     # STANDARD SCALER
-    # =====================================================
+    # =====================================
 
     scaled_df, scaler = preprocess_data(clean_df)
 
-    with tab3:
+    st.subheader("📊 Hasil StandardScaler")
 
-        st.dataframe(
-            scaled_df,
-            use_container_width=True,
-            hide_index=True
-        )
+    st.dataframe(
+        scaled_df,
+        use_container_width=True,
+        hide_index=True
+    )
 
-    # =====================================================
-    # SESSION STATE
-    # =====================================================
+    # =====================================
+    # SIMPAN KE SESSION
+    # =====================================
 
     st.session_state["original_df"] = clean_df
     st.session_state["scaled_df"] = scaled_df
@@ -89,11 +88,11 @@ def show_preprocessing():
 
     st.markdown("---")
 
-    # =====================================================
-    # FITUR
-    # =====================================================
+    # =====================================
+    # FITUR YANG DIGUNAKAN
+    # =====================================
 
-    st.subheader("📌 Variabel yang Digunakan")
+    st.subheader("📌 Variabel Clustering")
 
     fitur = pd.DataFrame({
         "Nama Variabel": get_feature_columns()
@@ -107,27 +106,27 @@ def show_preprocessing():
 
     st.markdown("---")
 
-    # =====================================================
+    # =====================================
     # RINGKASAN
-    # =====================================================
+    # =====================================
 
-    c1, c2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-    with c1:
+    col1.metric(
+        "Jumlah Data",
+        len(clean_df)
+    )
 
-        st.metric(
-            "Jumlah Data",
-            len(clean_df)
-        )
-
-    with c2:
-
-        st.metric(
-            "Jumlah Variabel",
-            len(get_feature_columns())
-        )
+    col2.metric(
+        "Jumlah Variabel",
+        len(get_feature_columns())
+    )
 
     st.markdown("---")
+
+    # =====================================
+    # DOWNLOAD
+    # =====================================
 
     csv = scaled_df.to_csv(
         index=False
