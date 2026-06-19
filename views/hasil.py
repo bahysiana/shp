@@ -4,13 +4,18 @@ import plotly.express as px
 
 def show_hasil():
 
-    st.title("📈 Hasil Analisis")
+    st.title("📈 Hasil Clustering")
 
-    st.caption(
-        "Visualisasi dan Ringkasan Hasil K-Means Clustering"
+    st.write(
+        "Halaman ini menampilkan ringkasan hasil "
+        "pengelompokan data menggunakan metode K-Means."
     )
 
     st.markdown("---")
+
+    # =====================================================
+    # VALIDASI
+    # =====================================================
 
     if "hasil_cluster" not in st.session_state:
 
@@ -21,47 +26,41 @@ def show_hasil():
         return
 
     hasil = st.session_state["hasil_cluster"]
-    centroid = st.session_state["centroid"]
     summary = st.session_state["summary_cluster"]
+    centroid = st.session_state["centroid"]
     statistik = st.session_state["cluster_statistics"]
     silhouette = st.session_state["silhouette"]
 
     # =====================================================
-    # KPI
+    # METRIC
     # =====================================================
 
     c1, c2, c3 = st.columns(3)
 
-    with c1:
+    c1.metric(
+        "Jumlah Cluster",
+        "3"
+    )
 
-        st.metric(
-            "Jumlah Cluster",
-            "3"
-        )
+    c2.metric(
+        "Silhouette Score",
+        f"{silhouette:.4f}"
+    )
 
-    with c2:
-
-        st.metric(
-            "Silhouette Score",
-            f"{silhouette:.4f}"
-        )
-
-    with c3:
-
-        st.metric(
-            "Total Data",
-            len(hasil)
-        )
+    c3.metric(
+        "Total Data",
+        len(hasil)
+    )
 
     st.markdown("---")
 
     # =====================================================
-    # VISUALISASI
+    # GRAFIK BAR
     # =====================================================
 
-    left, right = st.columns(2)
+    kiri, kanan = st.columns(2)
 
-    with left:
+    with kiri:
 
         fig_bar = px.bar(
             summary,
@@ -77,13 +76,13 @@ def show_hasil():
             use_container_width=True
         )
 
-    with right:
+    with kanan:
 
         fig_pie = px.pie(
             summary,
             names="cluster",
             values="Jumlah Data",
-            hole=0.5,
+            hole=0.45,
             title="Distribusi Cluster"
         )
 
@@ -93,6 +92,10 @@ def show_hasil():
         )
 
     st.markdown("---")
+
+    # =====================================================
+    # SCATTER
+    # =====================================================
 
     fig_scatter = px.scatter(
         hasil,
@@ -111,13 +114,15 @@ def show_hasil():
 
     st.markdown("---")
 
-    tab1, tab2, tab3 = st.tabs(
-        [
-            "📍 Centroid",
-            "📊 Statistik",
-            "📄 Dataset"
-        ]
-    )
+    # =====================================================
+    # TAB
+    # =====================================================
+
+    tab1, tab2, tab3 = st.tabs([
+        "📍 Centroid",
+        "📊 Statistik",
+        "📄 Dataset"
+    ])
 
     with tab1:
 
@@ -142,4 +147,18 @@ def show_hasil():
             use_container_width=True,
             hide_index=True
         )
+
+    st.markdown("---")
+
+    csv = hasil.to_csv(
+        index=False
+    ).encode("utf-8")
+
+    st.download_button(
+        label="⬇️ Download Hasil Clustering",
+        data=csv,
+        file_name="hasil_clustering.csv",
+        mime="text/csv",
+        use_container_width=True
+    )
 
