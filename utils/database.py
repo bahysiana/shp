@@ -1,3 +1,4 @@
+```python
 import sqlite3
 from pathlib import Path
 import pandas as pd
@@ -9,7 +10,7 @@ import pandas as pd
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DATABASE_DIR = BASE_DIR / "database"
-DATABASE_DIR.mkdir(exist_ok=True)
+DATABASE_DIR.mkdir(parents=True, exist_ok=True)
 
 DB_PATH = DATABASE_DIR / "shopee_food.db"
 
@@ -40,11 +41,11 @@ def create_table():
 
             Total_harga REAL,
             harga_per_menu TEXT,
+
             Jumlah_pesanan REAL,
             rata_rata_harga REAL,
 
-            waktu_persiapan_yang_diberikan TEXT,
-            waktu_persiapan_digunakan TEXT,
+            waktu_persiapan_digunakan REAL,
 
             waktu_pesan TEXT
 
@@ -56,7 +57,7 @@ def create_table():
 
 
 # =====================================================
-# AMBIL DATA
+# AMBIL SEMUA DATA
 # =====================================================
 
 def get_all_data():
@@ -65,7 +66,7 @@ def get_all_data():
 
     try:
 
-        df = pd.read_sql(
+        df = pd.read_sql_query(
             "SELECT * FROM transaksi",
             conn
         )
@@ -88,9 +89,12 @@ def get_all_data():
 def delete_all_data():
 
     conn = get_connection()
+
     cursor = conn.cursor()
 
-    cursor.execute("DELETE FROM transaksi")
+    cursor.execute(
+        "DELETE FROM transaksi"
+    )
 
     conn.commit()
     conn.close()
@@ -106,9 +110,12 @@ def insert_dataframe(df):
 
     try:
 
-        # Hilangkan kolom id jika ada
+        # Hapus kolom yang tidak dipakai jika ada
         if "id" in df.columns:
             df = df.drop(columns=["id"])
+
+        if "waktu_persiapan_yang_diberikan" in df.columns:
+            df = df.drop(columns=["waktu_persiapan_yang_diberikan"])
 
         df.to_sql(
             "transaksi",
@@ -136,13 +143,18 @@ def replace_all_data(df):
 
         cursor = conn.cursor()
 
-        cursor.execute("DELETE FROM transaksi")
+        cursor.execute(
+            "DELETE FROM transaksi"
+        )
 
         conn.commit()
 
-        # Hilangkan kolom id jika ada
+        # Hapus kolom yang tidak dipakai jika ada
         if "id" in df.columns:
             df = df.drop(columns=["id"])
+
+        if "waktu_persiapan_yang_diberikan" in df.columns:
+            df = df.drop(columns=["waktu_persiapan_yang_diberikan"])
 
         df.to_sql(
             "transaksi",
@@ -163,3 +175,4 @@ def replace_all_data(df):
 # =====================================================
 
 create_table()
+```
