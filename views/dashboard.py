@@ -1,5 +1,6 @@
 import streamlit as st
 import plotly.express as px
+
 from utils.database import get_all_data
 
 
@@ -7,25 +8,30 @@ def show_dashboard():
 
     st.title("📊 Dashboard")
 
-    st.caption(
-        "Analisis Pola Transaksi Shopee Food"
+    st.markdown(
+        "Selamat datang di Sistem Analisis Pola Transaksi Shopee Food "
+        "menggunakan Metode K-Means Clustering."
     )
 
     st.markdown("---")
+
+    # =====================================
+    # LOAD DATA
+    # =====================================
 
     df = get_all_data()
 
     if df.empty:
 
-        st.info(
+        st.warning(
             "Belum ada data. Silakan import dataset pada menu Kelola Data."
         )
 
         return
 
-    # =====================================================
+    # =====================================
     # KPI
-    # =====================================================
+    # =====================================
 
     total_transaksi = len(df)
 
@@ -35,43 +41,39 @@ def show_dashboard():
 
     rata_harga = df["rata_rata_harga"].mean()
 
-    c1, c2, c3, c4 = st.columns(4)
+    col1, col2, col3, col4 = st.columns(4)
 
-    with c1:
+    col1.metric(
+        "🧾 Total Transaksi",
+        f"{total_transaksi:,}"
+    )
 
-        st.metric(
-            "🧾 Total Transaksi",
-            f"{total_transaksi:,}"
-        )
+    col2.metric(
+        "💰 Total Omzet",
+        f"Rp {total_omzet:,.0f}"
+    )
 
-    with c2:
+    col3.metric(
+        "📦 Total Item",
+        f"{int(total_item):,}"
+    )
 
-        st.metric(
-            "💰 Total Omzet",
-            f"Rp {total_omzet:,.0f}"
-        )
-
-    with c3:
-
-        st.metric(
-            "📦 Total Pesanan",
-            f"{int(total_item):,}"
-        )
-
-    with c4:
-
-        st.metric(
-            "🏷️ Rata-rata Harga",
-            f"Rp {rata_harga:,.0f}"
-        )
+    col4.metric(
+        "🏷️ Rata-rata Harga",
+        f"Rp {rata_harga:,.0f}"
+    )
 
     st.markdown("---")
+
+    # =====================================
+    # GRAFIK
+    # =====================================
 
     kiri, kanan = st.columns(2)
 
     with kiri:
 
-        fig1 = px.histogram(
+        fig_total = px.histogram(
             df,
             x="Total_harga",
             nbins=20,
@@ -79,13 +81,13 @@ def show_dashboard():
         )
 
         st.plotly_chart(
-            fig1,
+            fig_total,
             use_container_width=True
         )
 
     with kanan:
 
-        fig2 = px.histogram(
+        fig_jumlah = px.histogram(
             df,
             x="Jumlah_pesanan",
             nbins=15,
@@ -93,13 +95,17 @@ def show_dashboard():
         )
 
         st.plotly_chart(
-            fig2,
+            fig_jumlah,
             use_container_width=True
         )
 
     st.markdown("---")
 
-    fig3 = px.scatter(
+    # =====================================
+    # SCATTER
+    # =====================================
+
+    fig_scatter = px.scatter(
         df,
         x="Jumlah_pesanan",
         y="Total_harga",
@@ -109,11 +115,15 @@ def show_dashboard():
     )
 
     st.plotly_chart(
-        fig3,
+        fig_scatter,
         use_container_width=True
     )
 
     st.markdown("---")
+
+    # =====================================
+    # PREVIEW DATA
+    # =====================================
 
     st.subheader("📋 Preview Dataset")
 
@@ -122,3 +132,4 @@ def show_dashboard():
         use_container_width=True,
         hide_index=True
     )
+
