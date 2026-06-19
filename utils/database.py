@@ -3,23 +3,24 @@ from pathlib import Path
 import pandas as pd
 
 # =====================================================
-# PATH DATABASE
+# LOKASI DATABASE
 # =====================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DATABASE_DIR = BASE_DIR / "database"
-DATABASE_DIR.mkdir(parents=True, exist_ok=True)
+DATABASE_DIR.mkdir(exist_ok=True)
 
 DB_PATH = DATABASE_DIR / "shopee_food.db"
 
+
 # =====================================================
-# KONEKSI
+# KONEKSI DATABASE
 # =====================================================
 
 def get_connection():
-    conn = sqlite3.connect(DB_PATH)
-    return conn
+    return sqlite3.connect(DB_PATH, check_same_thread=False)
+
 
 # =====================================================
 # MEMBUAT TABEL
@@ -33,19 +34,17 @@ def create_table():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS transaksi (
 
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-
             no INTEGER,
             username TEXT,
             menu_yang_dibeli TEXT,
 
             Total_harga REAL,
-            harga_per_menu REAL,
-            Jumlah_pesanan INTEGER,
+            harga_per_menu TEXT,
+            Jumlah_pesanan REAL,
             rata_rata_harga REAL,
 
-            waktu_persiapan_yang_diberikan REAL,
-            waktu_persiapan_digunakan REAL,
+            waktu_persiapan_yang_diberikan TEXT,
+            waktu_persiapan_digunakan TEXT,
 
             waktu_pesan TEXT
 
@@ -55,8 +54,9 @@ def create_table():
     conn.commit()
     conn.close()
 
+
 # =====================================================
-# AMBIL SEMUA DATA
+# AMBIL DATA
 # =====================================================
 
 def get_all_data():
@@ -64,51 +64,65 @@ def get_all_data():
     conn = get_connection()
 
     try:
-        df = pd.read_sql_query(
+
+        df = pd.read_sql(
             "SELECT * FROM transaksi",
             conn
         )
-    except:
+
+    except Exception:
+
         df = pd.DataFrame()
 
-    conn.close()
+    finally:
+
+        conn.close()
 
     return df
 
+
 # =====================================================
-# HAPUS SELURUH DATA
+# HAPUS SEMUA DATA
 # =====================================================
 
 def delete_all_data():
 
     conn = get_connection()
-
     cursor = conn.cursor()
 
-    cursor.execute(
-        "DELETE FROM transaksi"
-    )
+    cursor.execute("DELETE FROM transaksi")
 
     conn.commit()
-
     conn.close()
 
+
 # =====================================================
-# IMPORT DATAFRAME
+# SIMPAN DATAFRAME
 # =====================================================
 
 def insert_dataframe(df):
 
     conn = get_connection()
 
-    df.to_sql(
-        "transaksi",
-        conn,
-        if_exists="append",
-        index=False
-    )
+    try:
 
-    conn.close()
+        # Hilangkan kolom id jika ada
+        if "id" in df.columns:
+            df = df.drop(columns=["id"])
+
+        df.to_sql(
+            "transaksi",
+            conn,
+            if_exists="append",
+            index=False
+        )
+
+        conn.commit()
+
+    finally:
+
+        conn.close()
+
 
 # =====================================================
 # GANTI SELURUH DATA
@@ -116,22 +130,36 @@ def insert_dataframe(df):
 
 def replace_all_data(df):
 
-    delete_all_data()
-
     conn = get_connection()
 
-    df.to_sql(
-        "transaksi",
-        conn,
-        if_exists="append",
-        index=False
-    )
+    try:
 
-    conn.close()
+        cursor = conn.cursor()
+
+        cursor.execute("DELETE FROM transaksi")
+
+        conn.commit()
+
+        # Hilangkan kolom id jika ada
+        if "id" in df.columns:
+            df = df.drop(columns=["id"])
+
+        df.to_sql(
+            "transaksi",
+            conn,
+            if_exists="append",
+            index=False
+        )
+
+        conn.commit()
+
+    finally:
+
+        conn.close()
+
 
 # =====================================================
 # INISIALISASI
 # =====================================================
 
 create_table()
-
