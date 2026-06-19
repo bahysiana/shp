@@ -58,10 +58,7 @@ def run_kmeans(data):
 
 def calculate_silhouette(data, labels):
 
-    return silhouette_score(
-        data,
-        labels
-    )
+    return silhouette_score(data, labels)
 
 
 # =====================================================
@@ -102,11 +99,13 @@ def add_cluster_label(df):
 
 def cluster_summary(df):
 
-    return (
-        df.groupby("Label")
+    summary = (
+        df.groupby("cluster")
           .size()
           .reset_index(name="Jumlah Data")
     )
+
+    return summary
 
 
 # =====================================================
@@ -115,7 +114,7 @@ def cluster_summary(df):
 
 def cluster_statistics(df):
 
-    return (
+    statistik = (
         df.groupby("Label")[
             [
                 "Total_harga",
@@ -128,4 +127,6 @@ def cluster_statistics(df):
         .round(2)
         .reset_index()
     )
+
+    return statistik
 
