@@ -23,9 +23,9 @@ def show_kmeans():
 
     st.markdown("---")
 
-    # ==========================================
+    # =====================================================
     # VALIDASI
-    # ==========================================
+    # =====================================================
 
     if "scaled_df" not in st.session_state:
 
@@ -38,9 +38,9 @@ def show_kmeans():
     scaled_df = st.session_state["scaled_df"]
     original_df = st.session_state["original_df"]
 
-    # ==========================================
+    # =====================================================
     # ELBOW METHOD
-    # ==========================================
+    # =====================================================
 
     st.subheader("📈 Elbow Method")
 
@@ -68,9 +68,9 @@ def show_kmeans():
 
     st.markdown("---")
 
-    # ==========================================
-    # PROSES CLUSTERING
-    # ==========================================
+    # =====================================================
+    # PROSES K-MEANS
+    # =====================================================
 
     if st.button(
         "🚀 Jalankan K-Means",
@@ -109,35 +109,32 @@ def show_kmeans():
         st.session_state["cluster_statistics"] = statistik
         st.session_state["silhouette"] = silhouette
 
-    # ==========================================
+    # =====================================================
     # TAMPILKAN HASIL
-    # ==========================================
+    # =====================================================
 
     if "hasil_cluster" not in st.session_state:
         return
 
     st.markdown("---")
 
-    c1, c2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-    c1.metric(
+    col1.metric(
         "Jumlah Cluster",
         "3"
     )
 
-    c2.metric(
+    col2.metric(
         "Silhouette Score",
-        round(
-            st.session_state["silhouette"],
-            4
-        )
+        f"{st.session_state['silhouette']:.4f}"
     )
 
     st.markdown("---")
 
-    # ==========================================
+    # =====================================================
     # CENTROID
-    # ==========================================
+    # =====================================================
 
     st.subheader("📍 Nilai Centroid")
 
@@ -149,42 +146,68 @@ def show_kmeans():
 
     st.markdown("---")
 
-    # ==========================================
-    # RINGKASAN
-    # ==========================================
+    # =====================================================
+    # RINGKASAN CLUSTER
+    # =====================================================
 
     st.subheader("📊 Ringkasan Cluster")
 
+    summary_df = st.session_state["summary_cluster"].copy()
+
     st.dataframe(
-        st.session_state["summary_cluster"],
+        summary_df,
         use_container_width=True,
         hide_index=True
     )
 
     st.markdown("---")
 
-    # ==========================================
+    # =====================================================
     # PIE CHART
-    # ==========================================
+    # =====================================================
 
-    fig_pie = px.pie(
-        st.session_state["summary_cluster"],
-        names="cluster",
-        values="Jumlah Data",
-        hole=0.45,
-        title="Distribusi Cluster"
-    )
+    if (
+        "cluster" in summary_df.columns
+        and
+        "Jumlah Data" in summary_df.columns
+    ):
 
-    st.plotly_chart(
-        fig_pie,
-        use_container_width=True
-    )
+        label_map = {
+            0: "Pola Pemesanan Personal",
+            1: "Pola Pemesanan Reguler",
+            2: "Pola Pemesanan Kelompok"
+        }
+
+        summary_df["Nama Cluster"] = (
+            summary_df["cluster"]
+            .map(label_map)
+            .fillna(summary_df["cluster"].astype(str))
+        )
+
+        fig_pie = px.pie(
+            summary_df,
+            names="Nama Cluster",
+            values="Jumlah Data",
+            hole=0.45,
+            title="Distribusi Cluster"
+        )
+
+        st.plotly_chart(
+            fig_pie,
+            use_container_width=True
+        )
+
+    else:
+
+        st.warning(
+            "Data ringkasan cluster tidak tersedia."
+        )
 
     st.markdown("---")
 
-    # ==========================================
-    # SCATTER
-    # ==========================================
+    # =====================================================
+    # SCATTER PLOT
+    # =====================================================
 
     fig_scatter = px.scatter(
         st.session_state["hasil_cluster"],
@@ -203,9 +226,23 @@ def show_kmeans():
 
     st.markdown("---")
 
-    # ==========================================
-    # DATA HASIL
-    # ==========================================
+    # =====================================================
+    # STATISTIK CLUSTER
+    # =====================================================
+
+    st.subheader("📈 Statistik Cluster")
+
+    st.dataframe(
+        st.session_state["cluster_statistics"],
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.markdown("---")
+
+    # =====================================================
+    # HASIL CLUSTERING
+    # =====================================================
 
     st.subheader("📄 Hasil Clustering")
 
@@ -222,7 +259,7 @@ def show_kmeans():
     )
 
     st.download_button(
-        "⬇️ Download Hasil Clustering",
+        label="⬇️ Download Hasil Clustering",
         data=csv,
         file_name="hasil_clustering.csv",
         mime="text/csv",
