@@ -1,6 +1,3 @@
-```python
-# app.py
-
 import streamlit as st
 from streamlit_option_menu import option_menu
 
@@ -177,4 +174,4 @@ elif selected == "Tentang":
     from views.tentang import show_tentang
 
     show_tentang()
-```
+
