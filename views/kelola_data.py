@@ -11,17 +11,16 @@ from utils.database import (
 def show_kelola_data():
 
     st.title("📂 Kelola Data")
-
     st.write("Upload dan kelola dataset transaksi Shopee Food.")
 
     st.markdown("---")
 
-    # =====================================
-    # UPLOAD FILE
-    # =====================================
+    # ==========================
+    # Upload File
+    # ==========================
 
     uploaded_file = st.file_uploader(
-        "Upload Dataset",
+        "Upload Dataset (.csv / .xlsx)",
         type=["csv", "xlsx"]
     )
 
@@ -29,17 +28,34 @@ def show_kelola_data():
 
         try:
 
-            if uploaded_file.name.endswith(".csv"):
+            # --------------------------
+            # CSV
+            # --------------------------
 
-                df = pd.read_csv(uploaded_file)
+            if uploaded_file.name.lower().endswith(".csv"):
+
+                # Dataset Anda menggunakan delimiter ';'
+                df = pd.read_csv(
+                    uploaded_file,
+                    sep=";",
+                    encoding="utf-8"
+                )
+
+            # --------------------------
+            # Excel
+            # --------------------------
 
             else:
 
                 df = pd.read_excel(uploaded_file)
 
+            # Bersihkan nama kolom
+            df.columns = df.columns.str.strip()
+
+            # Simpan ke database
             replace_all_data(df)
 
-            st.success("✅ Dataset berhasil disimpan.")
+            st.success("✅ Dataset berhasil diupload dan disimpan.")
 
             st.rerun()
 
@@ -49,9 +65,9 @@ def show_kelola_data():
 
     st.markdown("---")
 
-    # =====================================
-    # LOAD DATABASE
-    # =====================================
+    # ==========================
+    # Load Data
+    # ==========================
 
     df = get_all_data()
 
@@ -61,103 +77,121 @@ def show_kelola_data():
 
         return
 
-    # =====================================
-    # METRIK
-    # =====================================
+    # ==========================
+    # Statistik
+    # ==========================
 
-    c1, c2, c3 = st.columns(3)
+    col1, col2, col3 = st.columns(3)
 
-    c1.metric(
+    col1.metric(
         "Jumlah Data",
         len(df)
     )
 
-    c2.metric(
-        "Total Omzet",
-        f"Rp {df['Total_harga'].sum():,.0f}"
-    )
+    try:
+        total = pd.to_numeric(
+            df["Total_harga"],
+            errors="coerce"
+        ).fillna(0).sum()
 
-    c3.metric(
-        "Jumlah Pesanan",
-        int(df["Jumlah_pesanan"].sum())
-    )
+        col2.metric(
+            "Total Omzet",
+            f"Rp {total:,.0f}"
+        )
+    except:
+        col2.metric(
+            "Total Omzet",
+            "-"
+        )
+
+    try:
+        jumlah = pd.to_numeric(
+            df["Jumlah_pesanan"],
+            errors="coerce"
+        ).fillna(0).sum()
+
+        col3.metric(
+            "Total Item",
+            int(jumlah)
+        )
+    except:
+        col3.metric(
+            "Total Item",
+            "-"
+        )
 
     st.markdown("---")
 
-    # =====================================
-    # PENCARIAN
-    # =====================================
+    # ==========================
+    # Search
+    # ==========================
 
     keyword = st.text_input(
         "🔍 Cari Username / Menu"
     )
 
-    hasil = df.copy()
+    tampil = df.copy()
 
     if keyword:
 
-        keyword = keyword.lower()
-
-        hasil = hasil[
-            (
-                hasil["username"]
-                .astype(str)
-                .str.lower()
-                .str.contains(keyword)
+        tampil = tampil[
+            tampil.astype(str)
+            .apply(
+                lambda x:
+                x.str.contains(
+                    keyword,
+                    case=False,
+                    na=False
+                )
             )
-            |
-            (
-                hasil["menu_yang_dibeli"]
-                .astype(str)
-                .str.lower()
-                .str.contains(keyword)
-            )
+            .any(axis=1)
         ]
 
-    # =====================================
-    # DATA
-    # =====================================
+    # ==========================
+    # Preview
+    # ==========================
 
     st.subheader("📋 Dataset")
 
     st.dataframe(
-        hasil,
+        tampil,
         use_container_width=True,
         hide_index=True
     )
 
     st.markdown("---")
 
-    # =====================================
-    # DOWNLOAD
-    # =====================================
+    # ==========================
+    # Download
+    # ==========================
 
-    csv = hasil.to_csv(
-        index=False
+    csv = tampil.to_csv(
+        index=False,
+        sep=";"
     ).encode("utf-8")
 
     st.download_button(
         label="⬇️ Download Dataset",
         data=csv,
-        file_name="dataset.csv",
+        file_name="dataset_shopee_food.csv",
         mime="text/csv",
         use_container_width=True
     )
 
-    # =====================================
-    # HAPUS DATA
-    # =====================================
-
     st.markdown("---")
+
+    # ==========================
+    # Hapus Data
+    # ==========================
 
     if st.button(
         "🗑️ Hapus Semua Data",
-        use_container_width=True
+        use_container_width=True,
+        type="secondary"
     ):
 
         delete_all_data()
 
-        st.success("Data berhasil dihapus.")
+        st.success("✅ Seluruh data berhasil dihapus.")
 
         st.rerun()
-
