@@ -40,7 +40,6 @@ def show_tentang():
             "Total_harga",
             "Jumlah_pesanan",
             "rata_rata_harga",
-            "waktu_persiapan_yang_diberikan",
             "waktu_persiapan_digunakan"
         ]
     })
