@@ -1,214 +1,212 @@
 /* ==========================================================
-   GLOBAL
+   assets/style.css
+   Modern Sidebar & Dashboard Style
 ========================================================== */
 
+/* ------------------------------
+   Background
+------------------------------ */
+
+.stApp {
+    background: #f4f7fb;
+}
+
 .main .block-container {
-    padding-top: 1rem;
+    padding-top: 1.5rem;
     padding-left: 2rem;
     padding-right: 2rem;
     padding-bottom: 2rem;
-    background-color: #F5F7FB;
 }
 
-.stApp {
-    background-color: #F5F7FB;
-}
-
-/* ==========================================================
-   SIDEBAR
-========================================================== */
+/* ------------------------------
+   Sidebar
+------------------------------ */
 
 [data-testid="stSidebar"] {
-    background: #FFFFFF;
-    border-right: 1px solid #E5E7EB;
+
+    background: linear-gradient(
+        180deg,
+        #ffffff,
+        #f8faff
+    );
+
+    border-right: 1px solid #e5e7eb;
+
+    min-width: 290px;
 }
 
 [data-testid="stSidebarContent"] {
-    padding-top: 20px;
-    padding-left: 12px;
-    padding-right: 12px;
+
+    padding-top: 25px;
+
+    padding-left: 18px;
+
+    padding-right: 18px;
 }
 
-/* ==========================================================
-   OPTION MENU
-========================================================== */
+/* ------------------------------
+   Sidebar Button
+------------------------------ */
 
-.nav-link {
+.stSidebar .stButton {
 
-    margin-top: 8px !important;
-
-    margin-bottom: 8px !important;
-
-    border-radius: 14px !important;
-
-    transition: all .3s ease;
-
-    font-weight: 600 !important;
+    margin-bottom: 12px;
 }
 
-.nav-link:hover {
+.stSidebar .stButton > button {
+
+    width: 100%;
+
+    height: 55px;
+
+    border: none;
+
+    border-radius: 18px;
+
+    background: white;
+
+    color: #1f2937;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    text-align: left;
+
+    padding-left: 18px;
+
+    transition: all .25s ease;
+
+    box-shadow:
+        0 3px 10px rgba(0,0,0,.06);
+}
+
+.stSidebar .stButton > button:hover {
 
     transform: translateX(4px);
 
-    background-color: #EEF2FF !important;
-}
-
-.nav-link-selected {
-
     background: linear-gradient(
         90deg,
-        #7C3AED,
-        #2563EB
-    ) !important;
-
-    color: white !important;
-
-    box-shadow: 0px 4px 15px rgba(
-        124,
-        58,
-        237,
-        0.30
+        #7c3aed,
+        #2563eb
     );
+
+    color: white;
 }
 
-/* ==========================================================
-   METRIC
-========================================================== */
+/* ------------------------------
+   Metric Card
+------------------------------ */
 
 [data-testid="metric-container"] {
 
     background: white;
 
+    border-radius: 20px;
+
+    padding: 20px;
+
+    border: 1px solid #ececec;
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,.05);
+}
+
+/* ------------------------------
+   Dataframe
+------------------------------ */
+
+[data-testid="stDataFrame"] {
+
     border-radius: 18px;
 
-    padding: 18px;
+    overflow: hidden;
 
-    border: 1px solid #E5E7EB;
-
-    box-shadow: 0 3px 12px rgba(
-        0,
-        0,
-        0,
-        0.05
-    );
+    border: 1px solid #ececec;
 }
 
-/* ==========================================================
-   BUTTON
-========================================================== */
+/* ------------------------------
+   Download Button
+------------------------------ */
 
-.stButton>button {
+.stDownloadButton > button {
 
     width: 100%;
 
-    border-radius: 14px;
+    height: 50px;
+
+    border-radius: 16px;
 
     border: none;
-
-    padding: 12px;
-
-    font-weight: bold;
-
-    color: white;
 
     background: linear-gradient(
         90deg,
-        #7C3AED,
-        #2563EB
+        #0f766e,
+        #0891b2
     );
-}
-
-.stButton>button:hover {
-
-    transform: scale(1.02);
-}
-
-/* ==========================================================
-   DOWNLOAD BUTTON
-========================================================== */
-
-.stDownloadButton>button {
-
-    width: 100%;
-
-    border-radius: 14px;
-
-    border: none;
-
-    padding: 12px;
 
     color: white;
 
     font-weight: bold;
-
-    background: linear-gradient(
-        90deg,
-        #0F766E,
-        #0891B2
-    );
 }
 
-/* ==========================================================
-   INPUT
-========================================================== */
+/* ------------------------------
+   Main Button
+------------------------------ */
+
+.stButton > button {
+
+    border-radius: 16px;
+}
+
+/* ------------------------------
+   Input
+------------------------------ */
 
 .stTextInput input,
 .stNumberInput input,
 textarea {
 
-    border-radius: 12px !important;
+    border-radius: 14px !important;
 }
 
-/* ==========================================================
-   DATAFRAME
-========================================================== */
+/* ------------------------------
+   Tabs
+------------------------------ */
 
-[data-testid="stDataFrame"] {
+button[role="tab"] {
 
-    border-radius: 16px;
+    border-radius: 12px;
 
-    border: 1px solid #E5E7EB;
+    padding: 10px 18px;
 }
 
-/* ==========================================================
-   FILE UPLOADER
-========================================================== */
+/* ------------------------------
+   Expander
+------------------------------ */
 
-[data-testid="stFileUploader"] {
+details {
 
-    border: 2px dashed #CBD5E1;
-
-    border-radius: 16px;
-
-    padding: 10px;
+    border-radius: 14px;
 }
 
-/* ==========================================================
-   TITLES
-========================================================== */
+/* ------------------------------
+   Progress
+------------------------------ */
 
-h1 {
+.stProgress > div > div {
 
-    color: #111827;
-
-    font-weight: 700;
+    background:
+        linear-gradient(
+            90deg,
+            #7c3aed,
+            #2563eb
+        );
 }
 
-h2 {
-
-    color: #1F2937;
-
-    font-weight: 700;
-}
-
-h3 {
-
-    color: #374151;
-}
-
-/* ==========================================================
-   SCROLLBAR
-========================================================== */
+/* ------------------------------
+   Scrollbar
+------------------------------ */
 
 ::-webkit-scrollbar {
 
@@ -217,8 +215,29 @@ h3 {
 
 ::-webkit-scrollbar-thumb {
 
-    background: #CBD5E1;
+    background: #cbd5e1;
 
     border-radius: 10px;
+}
+
+/* ------------------------------
+   Titles
+------------------------------ */
+
+h1 {
+
+    font-weight: 700;
+
+    color: #111827;
+}
+
+h2 {
+
+    font-weight: 700;
+}
+
+h3 {
+
+    font-weight: 600;
 }
 
