@@ -16,11 +16,16 @@ def show_kmeans():
 
     st.title("🎯 K-Means Clustering")
 
-    st.caption(
-        "Analisis menggunakan K = 3"
+    st.write(
+        "Proses clustering menggunakan algoritma "
+        "K-Means dengan jumlah cluster (K = 3)."
     )
 
     st.markdown("---")
+
+    # ==========================================
+    # VALIDASI
+    # ==========================================
 
     if "scaled_df" not in st.session_state:
 
@@ -33,9 +38,9 @@ def show_kmeans():
     scaled_df = st.session_state["scaled_df"]
     original_df = st.session_state["original_df"]
 
-    # =====================================================
+    # ==========================================
     # ELBOW METHOD
-    # =====================================================
+    # ==========================================
 
     st.subheader("📈 Elbow Method")
 
@@ -44,7 +49,7 @@ def show_kmeans():
         max_k=10
     )
 
-    fig = px.line(
+    fig_elbow = px.line(
         elbow_df,
         x="K",
         y="WCSS",
@@ -53,7 +58,7 @@ def show_kmeans():
     )
 
     st.plotly_chart(
-        fig,
+        fig_elbow,
         use_container_width=True
     )
 
@@ -63,9 +68,9 @@ def show_kmeans():
 
     st.markdown("---")
 
-    # =====================================================
-    # BUTTON
-    # =====================================================
+    # ==========================================
+    # PROSES CLUSTERING
+    # ==========================================
 
     if st.button(
         "🚀 Jalankan K-Means",
@@ -104,9 +109,9 @@ def show_kmeans():
         st.session_state["cluster_statistics"] = statistik
         st.session_state["silhouette"] = silhouette
 
-    # =====================================================
-    # HASIL
-    # =====================================================
+    # ==========================================
+    # TAMPILKAN HASIL
+    # ==========================================
 
     if "hasil_cluster" not in st.session_state:
         return
@@ -115,24 +120,24 @@ def show_kmeans():
 
     c1, c2 = st.columns(2)
 
-    with c1:
+    c1.metric(
+        "Jumlah Cluster",
+        "3"
+    )
 
-        st.metric(
-            "Jumlah Cluster",
-            "3"
+    c2.metric(
+        "Silhouette Score",
+        round(
+            st.session_state["silhouette"],
+            4
         )
-
-    with c2:
-
-        st.metric(
-            "Silhouette Score",
-            round(
-                st.session_state["silhouette"],
-                4
-            )
-        )
+    )
 
     st.markdown("---")
+
+    # ==========================================
+    # CENTROID
+    # ==========================================
 
     st.subheader("📍 Nilai Centroid")
 
@@ -144,6 +149,10 @@ def show_kmeans():
 
     st.markdown("---")
 
+    # ==========================================
+    # RINGKASAN
+    # ==========================================
+
     st.subheader("📊 Ringkasan Cluster")
 
     st.dataframe(
@@ -154,22 +163,30 @@ def show_kmeans():
 
     st.markdown("---")
 
-    pie = px.pie(
+    # ==========================================
+    # PIE CHART
+    # ==========================================
+
+    fig_pie = px.pie(
         st.session_state["summary_cluster"],
         names="cluster",
         values="Jumlah Data",
-        hole=0.55,
+        hole=0.45,
         title="Distribusi Cluster"
     )
 
     st.plotly_chart(
-        pie,
+        fig_pie,
         use_container_width=True
     )
 
     st.markdown("---")
 
-    scatter = px.scatter(
+    # ==========================================
+    # SCATTER
+    # ==========================================
+
+    fig_scatter = px.scatter(
         st.session_state["hasil_cluster"],
         x="Jumlah_pesanan",
         y="Total_harga",
@@ -180,13 +197,17 @@ def show_kmeans():
     )
 
     st.plotly_chart(
-        scatter,
+        fig_scatter,
         use_container_width=True
     )
 
     st.markdown("---")
 
-    st.subheader("📄 Dataset Hasil Clustering")
+    # ==========================================
+    # DATA HASIL
+    # ==========================================
+
+    st.subheader("📄 Hasil Clustering")
 
     st.dataframe(
         st.session_state["hasil_cluster"],
@@ -203,7 +224,7 @@ def show_kmeans():
     st.download_button(
         "⬇️ Download Hasil Clustering",
         data=csv,
-        file_name="hasil_kmeans.csv",
+        file_name="hasil_clustering.csv",
         mime="text/csv",
         use_container_width=True
     )
