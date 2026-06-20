@@ -14,88 +14,86 @@ def show_preprocessing():
     st.title("🧹 Preprocessing Data")
 
     st.write(
-        "Tahapan preprocessing meliputi pembersihan data dan "
-        "standardisasi menggunakan StandardScaler."
+        "Tahap preprocessing digunakan untuk membersihkan "
+        "dan melakukan standardisasi data sebelum proses K-Means."
     )
 
     st.markdown("---")
 
-    # =====================================
-    # LOAD DATA
-    # =====================================
+    # =====================================================
+    # AMBIL DATA
+    # =====================================================
 
     df = get_all_data()
 
     if df.empty:
 
         st.warning(
-            "Belum ada data. Silakan import dataset terlebih dahulu."
+            "Belum ada data. Silakan upload dataset terlebih dahulu."
         )
 
         return
 
-    # =====================================
-    # DATA AWAL
-    # =====================================
+    # =====================================================
+    # PREVIEW DATA ASLI
+    # =====================================================
 
-    st.subheader("📄 Data Awal")
+    st.subheader("📋 Data Asli")
 
     st.dataframe(
-        df,
+        df.head(10),
         use_container_width=True,
         hide_index=True
     )
 
     st.markdown("---")
 
-    # =====================================
-    # CLEANING
-    # =====================================
+    # =====================================================
+    # TOMBOL PREPROCESSING
+    # =====================================================
 
-    clean_df = clean_dataframe(df)
+    if st.button(
+        "🚀 Jalankan Preprocessing",
+        use_container_width=True
+    ):
 
-    st.subheader("🧹 Data Setelah Cleaning")
+        try:
 
-    st.dataframe(
-        clean_df,
-        use_container_width=True,
-        hide_index=True
-    )
+            # Bersihkan data
+            cleaned_df = clean_dataframe(df)
+
+            # Simpan data asli (setelah cleaning)
+            st.session_state["original_df"] = cleaned_df.copy()
+
+            # Standardisasi
+            scaled_df, scaler = preprocess_data(cleaned_df)
+
+            # Simpan ke session
+            st.session_state["scaled_df"] = scaled_df
+            st.session_state["scaler"] = scaler
+
+            st.success("✅ Preprocessing berhasil dilakukan.")
+
+        except Exception as e:
+
+            st.error(f"Terjadi kesalahan: {e}")
+
+            return
+
+    # =====================================================
+    # TAMPILKAN HASIL
+    # =====================================================
+
+    if "scaled_df" not in st.session_state:
+
+        return
 
     st.markdown("---")
 
-    # =====================================
-    # STANDARD SCALER
-    # =====================================
-
-    scaled_df, scaler = preprocess_data(clean_df)
-
-    st.subheader("📊 Hasil StandardScaler")
-
-    st.dataframe(
-        scaled_df,
-        use_container_width=True,
-        hide_index=True
-    )
-
-    # =====================================
-    # SIMPAN KE SESSION
-    # =====================================
-
-    st.session_state["original_df"] = clean_df
-    st.session_state["scaled_df"] = scaled_df
-    st.session_state["scaler"] = scaler
-
-    st.markdown("---")
-
-    # =====================================
-    # FITUR YANG DIGUNAKAN
-    # =====================================
-
-    st.subheader("📌 Variabel Clustering")
+    st.subheader("📊 Fitur yang Digunakan")
 
     fitur = pd.DataFrame({
-        "Nama Variabel": get_feature_columns()
+        "Nama Fitur": get_feature_columns()
     })
 
     st.dataframe(
@@ -106,37 +104,19 @@ def show_preprocessing():
 
     st.markdown("---")
 
-    # =====================================
-    # RINGKASAN
-    # =====================================
+    st.subheader("📈 Data Setelah Standardisasi")
 
-    col1, col2 = st.columns(2)
-
-    col1.metric(
-        "Jumlah Data",
-        len(clean_df)
-    )
-
-    col2.metric(
-        "Jumlah Variabel",
-        len(get_feature_columns())
+    st.dataframe(
+        st.session_state["scaled_df"].head(10),
+        use_container_width=True,
+        hide_index=True
     )
 
     st.markdown("---")
 
-    # =====================================
-    # DOWNLOAD
-    # =====================================
-
-    csv = scaled_df.to_csv(
-        index=False
-    ).encode("utf-8")
-
-    st.download_button(
-        label="⬇️ Download Hasil Preprocessing",
-        data=csv,
-        file_name="hasil_preprocessing.csv",
-        mime="text/csv",
-        use_container_width=True
+    st.info(
+        "Empat variabel yang digunakan dalam proses clustering adalah: "
+        "Total_harga, Jumlah_pesanan, rata_rata_harga, "
+        "dan waktu_persiapan_digunakan."
     )
 
