@@ -14,24 +14,22 @@ def show_preprocessing():
     st.title("🧹 Preprocessing Data")
 
     st.write(
-        "Tahap preprocessing digunakan untuk membersihkan "
-        "dan melakukan standardisasi data sebelum proses K-Means."
+        "Tahap preprocessing digunakan untuk membersihkan data "
+        "dan melakukan standardisasi sebelum proses K-Means."
     )
 
     st.markdown("---")
 
     # =====================================================
-    # AMBIL DATA
+    # AMBIL DATA DARI DATABASE
     # =====================================================
 
     df = get_all_data()
 
     if df.empty:
-
         st.warning(
             "Belum ada data. Silakan upload dataset terlebih dahulu."
         )
-
         return
 
     # =====================================================
@@ -49,7 +47,7 @@ def show_preprocessing():
     st.markdown("---")
 
     # =====================================================
-    # TOMBOL PREPROCESSING
+    # JALANKAN PREPROCESSING
     # =====================================================
 
     if st.button(
@@ -59,24 +57,27 @@ def show_preprocessing():
 
         try:
 
-            # Bersihkan data
+            # Membersihkan data
             cleaned_df = clean_dataframe(df)
 
-            # Simpan data asli (setelah cleaning)
+            # Simpan SEMUA kolom hasil cleaning
             st.session_state["original_df"] = cleaned_df.copy()
 
-            # Standardisasi
+            # Standardisasi hanya 4 fitur
             scaled_df, scaler = preprocess_data(cleaned_df)
 
-            # Simpan ke session
             st.session_state["scaled_df"] = scaled_df
             st.session_state["scaler"] = scaler
 
-            st.success("✅ Preprocessing berhasil dilakukan.")
+            st.success(
+                "✅ Preprocessing berhasil dilakukan."
+            )
 
         except Exception as e:
 
-            st.error(f"Terjadi kesalahan: {e}")
+            st.error(
+                f"Terjadi kesalahan: {e}"
+            )
 
             return
 
@@ -85,19 +86,18 @@ def show_preprocessing():
     # =====================================================
 
     if "scaled_df" not in st.session_state:
-
         return
 
     st.markdown("---")
 
     st.subheader("📊 Fitur yang Digunakan")
 
-    fitur = pd.DataFrame({
-        "Nama Fitur": get_feature_columns()
+    fitur_df = pd.DataFrame({
+        "Fitur Clustering": get_feature_columns()
     })
 
     st.dataframe(
-        fitur,
+        fitur_df,
         use_container_width=True,
         hide_index=True
     )
@@ -107,16 +107,24 @@ def show_preprocessing():
     st.subheader("📈 Data Setelah Standardisasi")
 
     st.dataframe(
-        st.session_state["scaled_df"].head(10),
+        st.session_state["scaled_df"],
         use_container_width=True,
         hide_index=True
     )
 
     st.markdown("---")
 
+    st.subheader("📋 Data Setelah Cleaning")
+
+    st.dataframe(
+        st.session_state["original_df"].head(10),
+        use_container_width=True,
+        hide_index=True
+    )
+
     st.info(
-        "Empat variabel yang digunakan dalam proses clustering adalah: "
-        "Total_harga, Jumlah_pesanan, rata_rata_harga, "
-        "dan waktu_persiapan_digunakan."
+        "K-Means menggunakan empat variabel: "
+        "Total_harga, Jumlah_pesanan, "
+        "rata_rata_harga, dan waktu_persiapan_digunakan."
     )
 
