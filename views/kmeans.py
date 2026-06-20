@@ -246,23 +246,60 @@ def show_kmeans():
 
     st.subheader("📄 Hasil Clustering")
 
+    hasil_df = st.session_state["hasil_cluster"].copy()
+
+    # Susun urutan kolom
+    urutan_kolom = [
+        "no",
+        "username",
+        "menu_yang_dibeli",
+        "Total_harga",
+        "harga_per_menu",
+        "Jumlah_pesanan",
+        "rata_rata_harga",
+        "waktu_persiapan_yang_diberikan",
+        "waktu_persiapan_digunakan",
+        "waktu_pesan",
+        "cluster",
+        "Label"
+    ]
+
+    # Ambil hanya kolom yang tersedia
+    kolom_tersedia = [
+        col for col in urutan_kolom
+        if col in hasil_df.columns
+    ]
+
+    # Tambahkan kolom lain (jika ada) agar tidak hilang
+    kolom_lain = [
+        col for col in hasil_df.columns
+        if col not in kolom_tersedia
+    ]
+
+    hasil_df = hasil_df[kolom_tersedia + kolom_lain]
+
+    # Tampilkan tabel
     st.dataframe(
-        st.session_state["hasil_cluster"],
+        hasil_df,
         use_container_width=True,
         hide_index=True
     )
 
-    csv = (
-        st.session_state["hasil_cluster"]
-        .to_csv(index=False)
-        .encode("utf-8")
-    )
+    st.markdown("---")
 
-    st.download_button(
+    # =====================================================
+    # DOWNLOAD HASIL
+    # =====================================================
+
+    csv = hasil_df.to_csv(
+        index=False
+    ).encode("utf-8")
+
+        st.download_button(
         label="⬇️ Download Hasil Clustering",
         data=csv,
         file_name="hasil_clustering.csv",
         mime="text/csv",
         use_container_width=True
-    )
+    )    
 
