@@ -15,12 +15,8 @@ def show_kelola_data():
 
     st.markdown("---")
 
-    # =====================================================
-    # UPLOAD FILE
-    # =====================================================
-
     uploaded_file = st.file_uploader(
-        "Upload Dataset (.csv / .xlsx)",
+        "Upload Dataset",
         type=["csv", "xlsx"]
     )
 
@@ -28,78 +24,50 @@ def show_kelola_data():
 
         try:
 
-            # ---------------------------------------------
+            # ==========================
             # BACA FILE
-            # ---------------------------------------------
+            # ==========================
 
             if uploaded_file.name.lower().endswith(".csv"):
 
                 df = pd.read_csv(
                     uploaded_file,
-                    sep=";",
-                    encoding="utf-8"
+                    sep=";"
                 )
 
             else:
 
-                df = pd.read_excel(uploaded_file)
+                df = pd.read_excel(
+                    uploaded_file
+                )
 
-            # ---------------------------------------------
+            # ==========================
             # BERSIHKAN NAMA KOLOM
-            # ---------------------------------------------
+            # ==========================
 
             df.columns = df.columns.str.strip()
 
-            # ---------------------------------------------
-            # TOTAL HARGA
-            # ---------------------------------------------
+            # ==========================
+            # KONVERSI NUMERIK
+            # ==========================
 
             if "Total_harga" in df.columns:
-
-                df["Total_harga"] = (
-                    df["Total_harga"]
-                    .astype(str)
-                    .str.replace(".", "", regex=False)
-                    .str.replace(",", "", regex=False)
-                )
-
                 df["Total_harga"] = pd.to_numeric(
                     df["Total_harga"],
                     errors="coerce"
                 )
 
-            # ---------------------------------------------
-            # JUMLAH PESANAN
-            # ---------------------------------------------
-
             if "Jumlah_pesanan" in df.columns:
-
                 df["Jumlah_pesanan"] = pd.to_numeric(
                     df["Jumlah_pesanan"],
                     errors="coerce"
                 )
 
-            # ---------------------------------------------
-            # RATA-RATA HARGA
-            # ---------------------------------------------
-
             if "rata_rata_harga" in df.columns:
-
-                df["rata_rata_harga"] = (
-                    df["rata_rata_harga"]
-                    .astype(str)
-                    .str.replace(".", "", regex=False)
-                    .str.replace(",", "", regex=False)
-                )
-
                 df["rata_rata_harga"] = pd.to_numeric(
                     df["rata_rata_harga"],
                     errors="coerce"
                 )
-
-            # ---------------------------------------------
-            # WAKTU PERSIAPAN DIGUNAKAN
-            # ---------------------------------------------
 
             if "waktu_persiapan_digunakan" in df.columns:
 
@@ -115,52 +83,39 @@ def show_kelola_data():
                     errors="coerce"
                 )
 
-            # ---------------------------------------------
-            # ISI NILAI KOSONG
-            # ---------------------------------------------
-
-            for col in [
-                "Total_harga",
-                "Jumlah_pesanan",
-                "rata_rata_harga",
-                "waktu_persiapan_digunakan"
-            ]:
-
-                if col in df.columns:
-
-                    df[col] = df[col].fillna(0)
-
-            # ---------------------------------------------
+            # ==========================
             # SIMPAN KE DATABASE
-            # ---------------------------------------------
+            # ==========================
 
             replace_all_data(df)
 
-            st.success("✅ Dataset berhasil diupload dan disimpan.")
+            st.success(
+                "✅ Dataset berhasil diupload."
+            )
 
             st.rerun()
 
         except Exception as e:
 
-            st.error(f"Gagal membaca file: {e}")
+            st.error(
+                f"Gagal membaca file: {e}"
+            )
 
     st.markdown("---")
-
-    # =====================================================
-    # LOAD DATA
-    # =====================================================
 
     df = get_all_data()
 
     if df.empty:
 
-        st.info("Belum ada data.")
+        st.info(
+            "Belum ada data."
+        )
 
         return
 
-    # =====================================================
-    # STATISTIK
-    # =====================================================
+    # ==========================
+    # METRIC
+    # ==========================
 
     col1, col2, col3 = st.columns(3)
 
@@ -169,88 +124,35 @@ def show_kelola_data():
         len(df)
     )
 
-    total_omzet = pd.to_numeric(
-        df["Total_harga"],
-        errors="coerce"
-    ).fillna(0).sum()
-
-    total_item = pd.to_numeric(
-        df["Jumlah_pesanan"],
-        errors="coerce"
-    ).fillna(0).sum()
-
     col2.metric(
         "Total Omzet",
-        f"Rp {total_omzet:,.0f}"
+        f"Rp {df['Total_harga'].sum():,.0f}"
     )
 
     col3.metric(
         "Total Item",
-        int(total_item)
+        int(df["Jumlah_pesanan"].sum())
     )
 
     st.markdown("---")
 
-    # =====================================================
-    # PENCARIAN
-    # =====================================================
+    # ==========================
+    # PREVIEW
+    # ==========================
 
-    keyword = st.text_input(
-        "🔍 Cari Username / Menu"
-    )
-
-    tampil = df.copy()
-
-    if keyword:
-
-        tampil = tampil[
-            tampil.astype(str)
-            .apply(
-                lambda x: x.str.contains(
-                    keyword,
-                    case=False,
-                    na=False
-                )
-            )
-            .any(axis=1)
-        ]
-
-    # =====================================================
-    # TAMPILKAN DATA
-    # =====================================================
-
-    st.subheader("📋 Dataset")
+    st.subheader("📋 Preview Dataset")
 
     st.dataframe(
-        tampil,
+        df,
         use_container_width=True,
         hide_index=True
     )
 
     st.markdown("---")
 
-    # =====================================================
-    # DOWNLOAD
-    # =====================================================
-
-    csv = tampil.to_csv(
-        index=False,
-        sep=";"
-    ).encode("utf-8")
-
-    st.download_button(
-        label="⬇️ Download Dataset",
-        data=csv,
-        file_name="dataset_shopee_food.csv",
-        mime="text/csv",
-        use_container_width=True
-    )
-
-    st.markdown("---")
-
-    # =====================================================
+    # ==========================
     # HAPUS DATA
-    # =====================================================
+    # ==========================
 
     if st.button(
         "🗑️ Hapus Semua Data",
@@ -259,6 +161,9 @@ def show_kelola_data():
 
         delete_all_data()
 
-        st.success("✅ Seluruh data berhasil dihapus.")
+        st.success(
+            "Semua data berhasil dihapus."
+        )
 
         st.rerun()
+
