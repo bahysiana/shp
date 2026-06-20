@@ -25,7 +25,7 @@ def elbow_method(data, max_k=10):
         wcss.append(model.inertia_)
 
     return pd.DataFrame({
-        "K": list(range(1, max_k + 1)),
+        "K": range(1, max_k + 1),
         "WCSS": wcss
     })
 
@@ -75,17 +75,26 @@ def add_cluster_result(df, labels):
 
 
 # =====================================================
-# LABEL CLUSTER
+# LABEL CLUSTER OTOMATIS
 # =====================================================
 
 def add_cluster_label(df):
 
     hasil = df.copy()
 
+    # Hitung rata-rata jumlah pesanan setiap cluster
+    ranking = (
+        hasil.groupby("cluster")["Jumlah_pesanan"]
+        .mean()
+        .sort_values()
+    )
+
+    urutan_cluster = ranking.index.tolist()
+
     mapping = {
-        0: "Pola Pemesanan Personal",
-        1: "Pola Pemesanan Reguler",
-        2: "Pola Pemesanan Kelompok"
+        urutan_cluster[0]: "Pola Pemesanan Personal",
+        urutan_cluster[1]: "Pola Pemesanan Reguler",
+        urutan_cluster[2]: "Pola Pemesanan Kelompok"
     }
 
     hasil["Label"] = hasil["cluster"].map(mapping)
@@ -100,11 +109,9 @@ def add_cluster_label(df):
 def cluster_summary(df):
 
     return (
-        df.groupby("cluster")
-          .size()
-          .reset_index(name="Jumlah Data")
-          .sort_values("cluster")
-          .reset_index(drop=True)
+        df.groupby("Label")
+        .size()
+        .reset_index(name="Jumlah Data")
     )
 
 
@@ -127,3 +134,4 @@ def cluster_statistics(df):
         .round(2)
         .reset_index()
     )
+
