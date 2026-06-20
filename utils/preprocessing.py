@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 # =====================================================
-# FITUR UNTUK CLUSTERING
+# FITUR UNTUK K-MEANS
 # =====================================================
 
 FEATURE_COLUMNS = [
@@ -25,33 +25,43 @@ def clean_dataframe(df):
 
     data = df.copy()
 
-    # Pastikan semua fitur tersedia
+    # Pastikan semua kolom tersedia
     for col in FEATURE_COLUMNS:
         if col not in data.columns:
-            raise ValueError(f"Kolom '{col}' tidak ditemukan pada dataset.")
+            raise ValueError(f"Kolom '{col}' tidak ditemukan.")
 
-    # Konversi ke numerik
+    # -----------------------------
+    # Total Harga
+    # -----------------------------
     data["Total_harga"] = pd.to_numeric(
         data["Total_harga"],
         errors="coerce"
     )
 
+    # -----------------------------
+    # Jumlah Pesanan
+    # -----------------------------
     data["Jumlah_pesanan"] = pd.to_numeric(
         data["Jumlah_pesanan"],
         errors="coerce"
     )
 
+    # -----------------------------
+    # Rata-rata Harga
+    # -----------------------------
     data["rata_rata_harga"] = pd.to_numeric(
         data["rata_rata_harga"],
         errors="coerce"
     )
 
-    # Bersihkan kolom waktu persiapan
+    # -----------------------------
+    # Waktu Persiapan Digunakan
+    # Ambil angka saja (contoh: "13 menit" -> 13)
+    # -----------------------------
     data["waktu_persiapan_digunakan"] = (
         data["waktu_persiapan_digunakan"]
         .astype(str)
-        .str.replace(" menit", "", regex=False)
-        .str.strip()
+        .str.extract(r"(\d+)", expand=False)
     )
 
     data["waktu_persiapan_digunakan"] = pd.to_numeric(
@@ -59,10 +69,13 @@ def clean_dataframe(df):
         errors="coerce"
     )
 
-    # Hapus baris yang memiliki nilai kosong
-    data = data.dropna(subset=FEATURE_COLUMNS)
+    # -----------------------------
+    # Hapus baris yang kosong pada fitur clustering
+    # -----------------------------
+    data = data.dropna(
+        subset=FEATURE_COLUMNS
+    )
 
-    # Reset index
     data = data.reset_index(drop=True)
 
     return data
@@ -76,12 +89,12 @@ def preprocess_data(df):
 
     scaler = StandardScaler()
 
-    scaled_array = scaler.fit_transform(
+    scaled = scaler.fit_transform(
         df[FEATURE_COLUMNS]
     )
 
     scaled_df = pd.DataFrame(
-        scaled_array,
+        scaled,
         columns=FEATURE_COLUMNS,
         index=df.index
     )
