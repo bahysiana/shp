@@ -11,7 +11,8 @@ from utils.database import (
 def show_kelola_data():
 
     st.title("📂 Kelola Data")
-    st.write("Upload dan kelola dataset transaksi Shopee Food.")
+
+    st.markdown("Upload dataset transaksi Shopee Food.")
 
     st.markdown("---")
 
@@ -24,9 +25,9 @@ def show_kelola_data():
 
         try:
 
-            # ==========================
+            # =====================================
             # BACA FILE
-            # ==========================
+            # =====================================
 
             if uploaded_file.name.lower().endswith(".csv"):
 
@@ -37,73 +38,92 @@ def show_kelola_data():
 
             else:
 
-                df = pd.read_excel(
-                    uploaded_file
-                )
+                df = pd.read_excel(uploaded_file)
 
-            # ==========================
+            # =====================================
             # BERSIHKAN NAMA KOLOM
-            # ==========================
+            # =====================================
 
             df.columns = df.columns.str.strip()
 
-            # Hapus kolom yang tidak digunakan
+            # =====================================
+            # HAPUS KOLOM YANG TIDAK DIPAKAI
+            # =====================================
+
             if "waktu_persiapan_yang_diberikan" in df.columns:
-            df = df.drop(columns=["waktu_persiapan_yang_diberikan"])
+                df.drop(
+                    columns=["waktu_persiapan_yang_diberikan"],
+                    inplace=True
+                )
 
-            # ==========================
+            # =====================================
+            # PILIH KOLOM YANG DIGUNAKAN
+            # =====================================
+
+            kolom = [
+                "no",
+                "username",
+                "menu_yang_dibeli",
+                "Total_harga",
+                "harga_per_menu",
+                "Jumlah_pesanan",
+                "rata_rata_harga",
+                "waktu_persiapan_digunakan",
+                "waktu_pesan",
+            ]
+
+            df = df[kolom]
+
+            # =====================================
             # KONVERSI NUMERIK
-            # ==========================
+            # =====================================
 
-            if "Total_harga" in df.columns:
-                df["Total_harga"] = pd.to_numeric(
-                    df["Total_harga"],
-                    errors="coerce"
-                )
+            df["Total_harga"] = pd.to_numeric(
+                df["Total_harga"],
+                errors="coerce"
+            )
 
-            if "Jumlah_pesanan" in df.columns:
-                df["Jumlah_pesanan"] = pd.to_numeric(
-                    df["Jumlah_pesanan"],
-                    errors="coerce"
-                )
+            df["Jumlah_pesanan"] = pd.to_numeric(
+                df["Jumlah_pesanan"],
+                errors="coerce"
+            )
 
-            if "rata_rata_harga" in df.columns:
-                df["rata_rata_harga"] = pd.to_numeric(
-                    df["rata_rata_harga"],
-                    errors="coerce"
-                )
+            df["rata_rata_harga"] = pd.to_numeric(
+                df["rata_rata_harga"],
+                errors="coerce"
+            )
 
-            if "waktu_persiapan_digunakan" in df.columns:
+            df["waktu_persiapan_digunakan"] = (
+                df["waktu_persiapan_digunakan"]
+                .astype(str)
+                .str.replace(" menit", "", regex=False)
+                .str.strip()
+            )
 
-                df["waktu_persiapan_digunakan"] = (
-                    df["waktu_persiapan_digunakan"]
-                    .astype(str)
-                    .str.replace(" menit", "", regex=False)
-                    .str.strip()
-                )
+            df["waktu_persiapan_digunakan"] = pd.to_numeric(
+                df["waktu_persiapan_digunakan"],
+                errors="coerce"
+            )
 
-                df["waktu_persiapan_digunakan"] = pd.to_numeric(
-                    df["waktu_persiapan_digunakan"],
-                    errors="coerce"
-                )
+            # =====================================
+            # HAPUS DATA KOSONG
+            # =====================================
 
-            # ==========================
-            # SIMPAN KE DATABASE
-            # ==========================
+            df = df.dropna()
+
+            # =====================================
+            # SIMPAN
+            # =====================================
 
             replace_all_data(df)
 
-            st.success(
-                "✅ Dataset berhasil diupload."
-            )
+            st.success("✅ Dataset berhasil diupload.")
 
             st.rerun()
 
         except Exception as e:
 
-            st.error(
-                f"Gagal membaca file: {e}"
-            )
+            st.error(f"Gagal membaca file: {e}")
 
     st.markdown("---")
 
@@ -111,40 +131,11 @@ def show_kelola_data():
 
     if df.empty:
 
-        st.info(
-            "Belum ada data."
-        )
+        st.info("Belum ada data.")
 
         return
 
-    # ==========================
-    # METRIC
-    # ==========================
-
-    col1, col2, col3 = st.columns(3)
-
-    col1.metric(
-        "Jumlah Data",
-        len(df)
-    )
-
-    col2.metric(
-        "Total Omzet",
-        f"Rp {df['Total_harga'].sum():,.0f}"
-    )
-
-    col3.metric(
-        "Total Item",
-        int(df["Jumlah_pesanan"].sum())
-    )
-
-    st.markdown("---")
-
-    # ==========================
-    # PREVIEW
-    # ==========================
-
-    st.subheader("📋 Preview Dataset")
+    st.metric("Jumlah Data", len(df))
 
     st.dataframe(
         df,
@@ -154,10 +145,6 @@ def show_kelola_data():
 
     st.markdown("---")
 
-    # ==========================
-    # HAPUS DATA
-    # ==========================
-
     if st.button(
         "🗑️ Hapus Semua Data",
         use_container_width=True
@@ -165,9 +152,6 @@ def show_kelola_data():
 
         delete_all_data()
 
-        st.success(
-            "Semua data berhasil dihapus."
-        )
+        st.success("Data berhasil dihapus.")
 
         st.rerun()
-
