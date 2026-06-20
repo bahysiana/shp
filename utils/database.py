@@ -3,23 +3,23 @@ from pathlib import Path
 import pandas as pd
 
 # =====================================================
-# LOKASI DATABASE
+# PATH DATABASE
 # =====================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DATABASE_DIR = BASE_DIR / "database"
-DATABASE_DIR.mkdir(parents=True, exist_ok=True)
+DB_DIR = BASE_DIR / "database"
+DB_DIR.mkdir(parents=True, exist_ok=True)
 
-DB_PATH = DATABASE_DIR / "shopee_food.db"
+DB_PATH = DB_DIR / "shopee_food.db"
 
 
 # =====================================================
-# KONEKSI DATABASE
+# KONEKSI
 # =====================================================
 
 def get_connection():
-    return sqlite3.connect(DB_PATH, check_same_thread=False)
+    return sqlite3.connect(DB_PATH)
 
 
 # =====================================================
@@ -41,7 +41,7 @@ def create_table():
             Total_harga REAL,
             harga_per_menu TEXT,
 
-            Jumlah_pesanan REAL,
+            Jumlah_pesanan INTEGER,
             rata_rata_harga REAL,
 
             waktu_persiapan_digunakan REAL,
@@ -82,55 +82,6 @@ def get_all_data():
 
 
 # =====================================================
-# HAPUS SEMUA DATA
-# =====================================================
-
-def delete_all_data():
-
-    conn = get_connection()
-
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "DELETE FROM transaksi"
-    )
-
-    conn.commit()
-    conn.close()
-
-
-# =====================================================
-# SIMPAN DATAFRAME
-# =====================================================
-
-def insert_dataframe(df):
-
-    conn = get_connection()
-
-    try:
-
-        # Hapus kolom yang tidak dipakai jika ada
-        if "id" in df.columns:
-            df = df.drop(columns=["id"])
-
-        if "waktu_persiapan_yang_diberikan" in df.columns:
-            df = df.drop(columns=["waktu_persiapan_yang_diberikan"])
-
-        df.to_sql(
-            "transaksi",
-            conn,
-            if_exists="append",
-            index=False
-        )
-
-        conn.commit()
-
-    finally:
-
-        conn.close()
-
-
-# =====================================================
 # GANTI SELURUH DATA
 # =====================================================
 
@@ -140,20 +91,33 @@ def replace_all_data(df):
 
     try:
 
-        cursor = conn.cursor()
+        # Hapus data lama
+        conn.execute("DELETE FROM transaksi")
 
-        cursor.execute(
-            "DELETE FROM transaksi"
+        # Simpan data baru
+        df.to_sql(
+            "transaksi",
+            conn,
+            if_exists="append",
+            index=False
         )
 
         conn.commit()
 
-        # Hapus kolom yang tidak dipakai jika ada
-        if "id" in df.columns:
-            df = df.drop(columns=["id"])
+    finally:
 
-        if "waktu_persiapan_yang_diberikan" in df.columns:
-            df = df.drop(columns=["waktu_persiapan_yang_diberikan"])
+        conn.close()
+
+
+# =====================================================
+# TAMBAH DATA
+# =====================================================
+
+def insert_dataframe(df):
+
+    conn = get_connection()
+
+    try:
 
         df.to_sql(
             "transaksi",
@@ -170,7 +134,25 @@ def replace_all_data(df):
 
 
 # =====================================================
-# INISIALISASI
+# HAPUS SEMUA DATA
+# =====================================================
+
+def delete_all_data():
+
+    conn = get_connection()
+
+    try:
+
+        conn.execute("DELETE FROM transaksi")
+        conn.commit()
+
+    finally:
+
+        conn.close()
+
+
+# =====================================================
+# INISIALISASI DATABASE
 # =====================================================
 
 create_table()
