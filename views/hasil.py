@@ -4,11 +4,11 @@ import plotly.express as px
 
 def show_hasil():
 
-    st.title("📊 Hasil Clustering")
+    st.title("📄 Data Hasil Clustering")
 
     st.write(
-        "Halaman ini menampilkan hasil akhir proses "
-        "K-Means Clustering."
+        "Menampilkan hasil akhir pengelompokan data transaksi "
+        "menggunakan metode K-Means Clustering."
     )
 
     st.markdown("---")
@@ -25,12 +25,20 @@ def show_hasil():
 
         return
 
-    hasil = st.session_state["hasil_cluster"]
-    statistik = st.session_state["cluster_statistics"]
-    summary = st.session_state["summary_cluster"]
+    hasil = st.session_state["hasil_cluster"].copy()
+
+    statistik = st.session_state.get(
+        "cluster_statistics",
+        None
+    )
+
+    silhouette = st.session_state.get(
+        "silhouette",
+        None
+    )
 
     # =====================================================
-    # METRIK
+    # METRIC
     # =====================================================
 
     col1, col2, col3 = st.columns(3)
@@ -45,10 +53,12 @@ def show_hasil():
         3
     )
 
-    col3.metric(
-        "Silhouette Score",
-        f"{st.session_state['silhouette']:.4f}"
-    )
+    if silhouette is not None:
+
+        col3.metric(
+            "Silhouette Score",
+            f"{silhouette:.4f}"
+        )
 
     st.markdown("---")
 
@@ -56,22 +66,15 @@ def show_hasil():
     # PIE CHART
     # =====================================================
 
-    summary_chart = summary.copy()
-
-    mapping = {
-        0: "Pola Pemesanan Personal",
-        1: "Pola Pemesanan Reguler",
-        2: "Pola Pemesanan Kelompok"
-    }
-
-    summary_chart["Kategori"] = (
-        summary_chart["cluster"]
-        .map(mapping)
+    summary = (
+        hasil.groupby("Label")
+        .size()
+        .reset_index(name="Jumlah Data")
     )
 
     fig_pie = px.pie(
-        summary_chart,
-        names="Kategori",
+        summary,
+        names="Label",
         values="Jumlah Data",
         hole=0.45,
         title="Distribusi Cluster"
@@ -106,41 +109,45 @@ def show_hasil():
     st.markdown("---")
 
     # =====================================================
-    # STATISTIK CLUSTER
+    # STATISTIK
     # =====================================================
 
-    st.subheader("📈 Statistik Cluster")
+    if statistik is not None:
+
+        st.subheader("📊 Statistik Cluster")
+
+        st.dataframe(
+            statistik,
+            use_container_width=True,
+            hide_index=True
+        )
+
+        st.markdown("---")
+
+    # =====================================================
+    # PILIH KOLOM YANG DITAMPILKAN
+    # =====================================================
+
+    kolom_tampil = [
+        "menu_yang_dibeli",
+        "Total_harga",
+        "harga_per_menu",
+        "Jumlah_pesanan",
+        "rata_rata_harga",
+        "waktu_persiapan_digunakan",
+        "cluster",
+        "Label"
+    ]
+
+    kolom_tampil = [
+        col for col in kolom_tampil
+        if col in hasil.columns
+    ]
+
+    st.subheader("📋 Data Hasil Clustering")
 
     st.dataframe(
-        statistik,
-        use_container_width=True,
-        hide_index=True
-    )
-
-    st.markdown("---")
-
-    # =====================================================
-    # RINGKASAN CLUSTER
-    # =====================================================
-
-    st.subheader("📋 Ringkasan Cluster")
-
-    st.dataframe(
-        summary_chart,
-        use_container_width=True,
-        hide_index=True
-    )
-
-    st.markdown("---")
-
-    # =====================================================
-    # HASIL CLUSTERING
-    # =====================================================
-
-    st.subheader("📄 Data Hasil Clustering")
-
-    st.dataframe(
-        hasil,
+        hasil[kolom_tampil],
         use_container_width=True,
         hide_index=True
     )
@@ -151,9 +158,11 @@ def show_hasil():
     # DOWNLOAD
     # =====================================================
 
-    csv = hasil.to_csv(
-        index=False
-    ).encode("utf-8")
+    csv = (
+        hasil[kolom_tampil]
+        .to_csv(index=False)
+        .encode("utf-8")
+    )
 
     st.download_button(
         label="⬇️ Download Hasil Clustering",
