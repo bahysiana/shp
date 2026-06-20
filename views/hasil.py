@@ -134,7 +134,6 @@ def show_hasil():
         "harga_per_menu",
         "Jumlah_pesanan",
         "rata_rata_harga",
-        "waktu_persiapan_yang_diberikan"
         "waktu_persiapan_digunakan",
         "cluster",
         "Label"
