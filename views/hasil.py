@@ -88,7 +88,7 @@ def show_hasil():
     st.markdown("---")
 
     # =====================================================
-    # SCATTER
+    # SCATTER PLOT
     # =====================================================
 
     fig_scatter = px.scatter(
@@ -109,7 +109,7 @@ def show_hasil():
     st.markdown("---")
 
     # =====================================================
-    # STATISTIK
+    # STATISTIK CLUSTER
     # =====================================================
 
     if statistik is not None:
@@ -125,29 +125,13 @@ def show_hasil():
         st.markdown("---")
 
     # =====================================================
-    # PILIH KOLOM YANG DITAMPILKAN
+    # DATA HASIL CLUSTERING
     # =====================================================
-
-    kolom_tampil = [
-        "menu_yang_dibeli",
-        "Total_harga",
-        "harga_per_menu",
-        "Jumlah_pesanan",
-        "rata_rata_harga",
-        "waktu_persiapan_digunakan",
-        "cluster",
-        "Label"
-    ]
-
-    kolom_tampil = [
-        col for col in kolom_tampil
-        if col in hasil.columns
-    ]
 
     st.subheader("📋 Data Hasil Clustering")
 
     st.dataframe(
-        hasil[kolom_tampil],
+        hasil,
         use_container_width=True,
         hide_index=True
     )
@@ -159,7 +143,7 @@ def show_hasil():
     # =====================================================
 
     csv = (
-        hasil[kolom_tampil]
+        hasil
         .to_csv(index=False)
         .encode("utf-8")
     )
@@ -171,3 +155,4 @@ def show_hasil():
         mime="text/csv",
         use_container_width=True
     )
+
