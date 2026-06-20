@@ -1,75 +1,20 @@
-import re
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 # =====================================================
-# FITUR YANG DIGUNAKAN UNTUK CLUSTERING
+# FITUR UNTUK K-MEANS
 # =====================================================
 
 FEATURE_COLUMNS = [
     "Total_harga",
     "Jumlah_pesanan",
     "rata_rata_harga",
-    "waktu_persiapan_digunakan",
+    "waktu_persiapan_digunakan"
 ]
 
 
 def get_feature_columns():
     return FEATURE_COLUMNS
-
-
-# =====================================================
-# FUNGSI PEMBERSIH NILAI
-# =====================================================
-
-def clean_number(value):
-    """
-    Mengubah berbagai format menjadi angka.
-
-    Contoh:
-    "13 menit" -> 13
-    "20.000" -> 20000
-    "20.000,10.000" -> 15000
-    """
-
-    if pd.isna(value):
-        return None
-
-    text = str(value).lower().strip()
-
-    # hapus kata "menit"
-    text = text.replace("menit", "").strip()
-
-    # jika berisi beberapa angka dipisahkan koma
-    if "," in text:
-
-        values = []
-
-        for item in text.split(","):
-
-            item = item.strip()
-            item = item.replace(".", "")
-
-            try:
-                values.append(float(item))
-            except:
-                pass
-
-        if len(values) > 0:
-            return sum(values) / len(values)
-
-    # ambil angka biasa
-    text = text.replace(".", "")
-
-    angka = re.findall(r"\d+\.?\d*", text)
-
-    if len(angka) == 0:
-        return None
-
-    try:
-        return float(angka[0])
-    except:
-        return None
 
 
 # =====================================================
@@ -80,14 +25,67 @@ def clean_dataframe(df):
 
     data = df.copy()
 
-    # Bersihkan setiap fitur numerik
-    for col in FEATURE_COLUMNS:
+    # -----------------------------
+    # Total_harga
+    # -----------------------------
+    if "Total_harga" in data.columns:
 
-        if col in data.columns:
+        data["Total_harga"] = (
+            data["Total_harga"]
+            .astype(str)
+            .str.replace(".", "", regex=False)
+        )
 
-            data[col] = data[col].apply(clean_number)
+        data["Total_harga"] = pd.to_numeric(
+            data["Total_harga"],
+            errors="coerce"
+        )
 
-    # Hapus data kosong
+    # -----------------------------
+    # Jumlah_pesanan
+    # JANGAN HAPUS TITIK!
+    # -----------------------------
+    if "Jumlah_pesanan" in data.columns:
+
+        data["Jumlah_pesanan"] = pd.to_numeric(
+            data["Jumlah_pesanan"],
+            errors="coerce"
+        )
+
+    # -----------------------------
+    # rata_rata_harga
+    # -----------------------------
+    if "rata_rata_harga" in data.columns:
+
+        data["rata_rata_harga"] = (
+            data["rata_rata_harga"]
+            .astype(str)
+            .str.replace(".", "", regex=False)
+        )
+
+        data["rata_rata_harga"] = pd.to_numeric(
+            data["rata_rata_harga"],
+            errors="coerce"
+        )
+
+    # -----------------------------
+    # waktu_persiapan_digunakan
+    # -----------------------------
+    if "waktu_persiapan_digunakan" in data.columns:
+
+        data["waktu_persiapan_digunakan"] = (
+            data["waktu_persiapan_digunakan"]
+            .astype(str)
+            .str.replace(" menit", "", regex=False)
+            .str.strip()
+        )
+
+        data["waktu_persiapan_digunakan"] = pd.to_numeric(
+            data["waktu_persiapan_digunakan"],
+            errors="coerce"
+        )
+
+    # Hilangkan nilai kosong
     data = data.dropna(subset=FEATURE_COLUMNS)
 
     # Reset index
@@ -114,3 +112,4 @@ def preprocess_data(df):
     )
 
     return scaled_df, scaler
+
