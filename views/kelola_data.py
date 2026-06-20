@@ -47,6 +47,10 @@ def show_kelola_data():
 
             df.columns = df.columns.str.strip()
 
+            # Hapus kolom yang tidak digunakan
+            if "waktu_persiapan_yang_diberikan" in df.columns:
+            df = df.drop(columns=["waktu_persiapan_yang_diberikan"])
+
             # ==========================
             # KONVERSI NUMERIK
             # ==========================
