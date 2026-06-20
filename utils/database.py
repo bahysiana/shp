@@ -15,7 +15,7 @@ DB_PATH = DB_DIR / "shopee_food.db"
 
 
 # =====================================================
-# KONEKSI
+# KONEKSI DATABASE
 # =====================================================
 
 def get_connection():
@@ -35,14 +35,20 @@ def create_table():
         CREATE TABLE IF NOT EXISTS transaksi (
 
             no INTEGER,
+
             username TEXT,
+
             menu_yang_dibeli TEXT,
 
             Total_harga REAL,
+
             harga_per_menu TEXT,
 
             Jumlah_pesanan INTEGER,
+
             rata_rata_harga REAL,
+
+            waktu_persiapan_yang_diberikan TEXT,
 
             waktu_persiapan_digunakan REAL,
 
@@ -91,10 +97,8 @@ def replace_all_data(df):
 
     try:
 
-        # Hapus data lama
         conn.execute("DELETE FROM transaksi")
 
-        # Simpan data baru
         df.to_sql(
             "transaksi",
             conn,
@@ -110,7 +114,7 @@ def replace_all_data(df):
 
 
 # =====================================================
-# TAMBAH DATA
+# TAMBAH DATAFRAME
 # =====================================================
 
 def insert_dataframe(df):
@@ -152,8 +156,7 @@ def delete_all_data():
 
 
 # =====================================================
-# INISIALISASI DATABASE
+# INISIALISASI
 # =====================================================
 
 create_table()
-
