@@ -4,11 +4,11 @@ import plotly.express as px
 
 def show_hasil():
 
-    st.title("📈 Hasil Clustering")
+    st.title("📊 Hasil Clustering")
 
     st.write(
-        "Halaman ini menampilkan ringkasan hasil "
-        "pengelompokan data menggunakan metode K-Means."
+        "Halaman ini menampilkan hasil akhir proses "
+        "K-Means Clustering."
     )
 
     st.markdown("---")
@@ -26,70 +26,61 @@ def show_hasil():
         return
 
     hasil = st.session_state["hasil_cluster"]
-    summary = st.session_state["summary_cluster"]
-    centroid = st.session_state["centroid"]
     statistik = st.session_state["cluster_statistics"]
-    silhouette = st.session_state["silhouette"]
+    summary = st.session_state["summary_cluster"]
 
     # =====================================================
-    # METRIC
+    # METRIK
     # =====================================================
 
-    c1, c2, c3 = st.columns(3)
+    col1, col2, col3 = st.columns(3)
 
-    c1.metric(
-        "Jumlah Cluster",
-        "3"
-    )
-
-    c2.metric(
-        "Silhouette Score",
-        f"{silhouette:.4f}"
-    )
-
-    c3.metric(
-        "Total Data",
+    col1.metric(
+        "Jumlah Data",
         len(hasil)
+    )
+
+    col2.metric(
+        "Jumlah Cluster",
+        3
+    )
+
+    col3.metric(
+        "Silhouette Score",
+        f"{st.session_state['silhouette']:.4f}"
     )
 
     st.markdown("---")
 
     # =====================================================
-    # GRAFIK BAR
+    # PIE CHART
     # =====================================================
 
-    kiri, kanan = st.columns(2)
+    summary_chart = summary.copy()
 
-    with kiri:
+    mapping = {
+        0: "Pola Pemesanan Personal",
+        1: "Pola Pemesanan Reguler",
+        2: "Pola Pemesanan Kelompok"
+    }
 
-        fig_bar = px.bar(
-            summary,
-            x="cluster",
-            y="Jumlah Data",
-            color="cluster",
-            text="Jumlah Data",
-            title="Jumlah Anggota Tiap Cluster"
-        )
+    summary_chart["Kategori"] = (
+        summary_chart["cluster"]
+        .map(mapping)
+    )
 
-        st.plotly_chart(
-            fig_bar,
-            use_container_width=True
-        )
+    fig_pie = px.pie(
+        summary_chart,
+        names="Kategori",
+        values="Jumlah Data",
+        hole=0.45,
+        title="Distribusi Cluster"
+    )
 
-    with kanan:
-
-        fig_pie = px.pie(
-            summary,
-            names="cluster",
-            values="Jumlah Data",
-            hole=0.45,
-            title="Distribusi Cluster"
-        )
-
-        st.plotly_chart(
-            fig_pie,
-            use_container_width=True
-        )
+    st.plotly_chart(
+        fig_pie,
+        use_container_width=True
+    )
 
     st.markdown("---")
 
@@ -104,7 +95,7 @@ def show_hasil():
         color="Label",
         size="rata_rata_harga",
         hover_name="username",
-        title="Visualisasi Persebaran Cluster"
+        title="Visualisasi Hasil Clustering"
     )
 
     st.plotly_chart(
@@ -115,40 +106,50 @@ def show_hasil():
     st.markdown("---")
 
     # =====================================================
-    # TAB
+    # STATISTIK CLUSTER
     # =====================================================
 
-    tab1, tab2, tab3 = st.tabs([
-        "📍 Centroid",
-        "📊 Statistik",
-        "📄 Dataset"
-    ])
+    st.subheader("📈 Statistik Cluster")
 
-    with tab1:
-
-        st.dataframe(
-            centroid,
-            use_container_width=True,
-            hide_index=True
-        )
-
-    with tab2:
-
-        st.dataframe(
-            statistik,
-            use_container_width=True,
-            hide_index=True
-        )
-
-    with tab3:
-
-        st.dataframe(
-            hasil,
-            use_container_width=True,
-            hide_index=True
-        )
+    st.dataframe(
+        statistik,
+        use_container_width=True,
+        hide_index=True
+    )
 
     st.markdown("---")
+
+    # =====================================================
+    # RINGKASAN CLUSTER
+    # =====================================================
+
+    st.subheader("📋 Ringkasan Cluster")
+
+    st.dataframe(
+        summary_chart,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.markdown("---")
+
+    # =====================================================
+    # HASIL CLUSTERING
+    # =====================================================
+
+    st.subheader("📄 Data Hasil Clustering")
+
+    st.dataframe(
+        hasil,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.markdown("---")
+
+    # =====================================================
+    # DOWNLOAD
+    # =====================================================
 
     csv = hasil.to_csv(
         index=False
@@ -161,4 +162,3 @@ def show_hasil():
         mime="text/csv",
         use_container_width=True
     )
-
