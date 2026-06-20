@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 # =====================================================
-# FITUR UNTUK K-MEANS
+# FITUR UNTUK CLUSTERING
 # =====================================================
 
 FEATURE_COLUMNS = [
@@ -25,67 +25,41 @@ def clean_dataframe(df):
 
     data = df.copy()
 
-    # -----------------------------
-    # Total_harga
-    # -----------------------------
-    if "Total_harga" in data.columns:
+    # Pastikan semua fitur tersedia
+    for col in FEATURE_COLUMNS:
+        if col not in data.columns:
+            raise ValueError(f"Kolom '{col}' tidak ditemukan pada dataset.")
 
-        data["Total_harga"] = (
-            data["Total_harga"]
-            .astype(str)
-            .str.replace(".", "", regex=False)
-        )
+    # Konversi ke numerik
+    data["Total_harga"] = pd.to_numeric(
+        data["Total_harga"],
+        errors="coerce"
+    )
 
-        data["Total_harga"] = pd.to_numeric(
-            data["Total_harga"],
-            errors="coerce"
-        )
+    data["Jumlah_pesanan"] = pd.to_numeric(
+        data["Jumlah_pesanan"],
+        errors="coerce"
+    )
 
-    # -----------------------------
-    # Jumlah_pesanan
-    # JANGAN HAPUS TITIK!
-    # -----------------------------
-    if "Jumlah_pesanan" in data.columns:
+    data["rata_rata_harga"] = pd.to_numeric(
+        data["rata_rata_harga"],
+        errors="coerce"
+    )
 
-        data["Jumlah_pesanan"] = pd.to_numeric(
-            data["Jumlah_pesanan"],
-            errors="coerce"
-        )
+    # Bersihkan kolom waktu persiapan
+    data["waktu_persiapan_digunakan"] = (
+        data["waktu_persiapan_digunakan"]
+        .astype(str)
+        .str.replace(" menit", "", regex=False)
+        .str.strip()
+    )
 
-    # -----------------------------
-    # rata_rata_harga
-    # -----------------------------
-    if "rata_rata_harga" in data.columns:
+    data["waktu_persiapan_digunakan"] = pd.to_numeric(
+        data["waktu_persiapan_digunakan"],
+        errors="coerce"
+    )
 
-        data["rata_rata_harga"] = (
-            data["rata_rata_harga"]
-            .astype(str)
-            .str.replace(".", "", regex=False)
-        )
-
-        data["rata_rata_harga"] = pd.to_numeric(
-            data["rata_rata_harga"],
-            errors="coerce"
-        )
-
-    # -----------------------------
-    # waktu_persiapan_digunakan
-    # -----------------------------
-    if "waktu_persiapan_digunakan" in data.columns:
-
-        data["waktu_persiapan_digunakan"] = (
-            data["waktu_persiapan_digunakan"]
-            .astype(str)
-            .str.replace(" menit", "", regex=False)
-            .str.strip()
-        )
-
-        data["waktu_persiapan_digunakan"] = pd.to_numeric(
-            data["waktu_persiapan_digunakan"],
-            errors="coerce"
-        )
-
-    # Hilangkan nilai kosong
+    # Hapus baris yang memiliki nilai kosong
     data = data.dropna(subset=FEATURE_COLUMNS)
 
     # Reset index
@@ -102,13 +76,14 @@ def preprocess_data(df):
 
     scaler = StandardScaler()
 
-    scaled = scaler.fit_transform(
+    scaled_array = scaler.fit_transform(
         df[FEATURE_COLUMNS]
     )
 
     scaled_df = pd.DataFrame(
-        scaled,
-        columns=FEATURE_COLUMNS
+        scaled_array,
+        columns=FEATURE_COLUMNS,
+        index=df.index
     )
 
     return scaled_df, scaler
