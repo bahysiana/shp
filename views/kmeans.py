@@ -116,13 +116,15 @@ def show_kmeans():
     if "hasil_cluster" not in st.session_state:
         return
 
+    hasil_df = st.session_state["hasil_cluster"].copy()
+
     st.markdown("---")
 
     col1, col2 = st.columns(2)
 
     col1.metric(
         "Jumlah Cluster",
-        "3"
+        3
     )
 
     col2.metric(
@@ -167,26 +169,14 @@ def show_kmeans():
     # =====================================================
 
     if (
-        "cluster" in summary_df.columns
+        "Label" in summary_df.columns
         and
         "Jumlah Data" in summary_df.columns
     ):
 
-        label_map = {
-            0: "Pola Pemesanan Personal",
-            1: "Pola Pemesanan Reguler",
-            2: "Pola Pemesanan Kelompok"
-        }
-
-        summary_df["Nama Cluster"] = (
-            summary_df["cluster"]
-            .map(label_map)
-            .fillna(summary_df["cluster"].astype(str))
-        )
-
         fig_pie = px.pie(
             summary_df,
-            names="Nama Cluster",
+            names="Label",
             values="Jumlah Data",
             hole=0.45,
             title="Distribusi Cluster"
@@ -197,12 +187,6 @@ def show_kmeans():
             use_container_width=True
         )
 
-    else:
-
-        st.warning(
-            "Data ringkasan cluster tidak tersedia."
-        )
-
     st.markdown("---")
 
     # =====================================================
@@ -210,7 +194,7 @@ def show_kmeans():
     # =====================================================
 
     fig_scatter = px.scatter(
-        st.session_state["hasil_cluster"],
+        hasil_df,
         x="Jumlah_pesanan",
         y="Total_harga",
         color="Label",
@@ -246,9 +230,6 @@ def show_kmeans():
 
     st.subheader("📄 Hasil Clustering")
 
-    hasil_df = st.session_state["hasil_cluster"].copy()
-
-    # Susun urutan kolom
     urutan_kolom = [
         "no",
         "username",
@@ -264,21 +245,20 @@ def show_kmeans():
         "Label"
     ]
 
-    # Ambil hanya kolom yang tersedia
     kolom_tersedia = [
         col for col in urutan_kolom
         if col in hasil_df.columns
     ]
 
-    # Tambahkan kolom lain (jika ada) agar tidak hilang
     kolom_lain = [
         col for col in hasil_df.columns
         if col not in kolom_tersedia
     ]
 
-    hasil_df = hasil_df[kolom_tersedia + kolom_lain]
+    hasil_df = hasil_df[
+        kolom_tersedia + kolom_lain
+    ]
 
-    # Tampilkan tabel
     st.dataframe(
         hasil_df,
         use_container_width=True,
@@ -288,18 +268,18 @@ def show_kmeans():
     st.markdown("---")
 
     # =====================================================
-    # DOWNLOAD HASIL
+    # DOWNLOAD
     # =====================================================
 
     csv = hasil_df.to_csv(
         index=False
     ).encode("utf-8")
 
-        st.download_button(
+    st.download_button(
         label="⬇️ Download Hasil Clustering",
         data=csv,
         file_name="hasil_clustering.csv",
         mime="text/csv",
         use_container_width=True
-    )    
+    )
 
