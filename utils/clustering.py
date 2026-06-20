@@ -31,7 +31,7 @@ def elbow_method(data, max_k=10):
 
 
 # =====================================================
-# K-MEANS (K = 3)
+# JALANKAN K-MEANS
 # =====================================================
 
 def run_kmeans(data):
@@ -62,7 +62,7 @@ def calculate_silhouette(data, labels):
 
 
 # =====================================================
-# TAMBAH HASIL CLUSTER
+# TAMBAHKAN HASIL CLUSTER
 # =====================================================
 
 def add_cluster_result(df, labels):
@@ -99,13 +99,13 @@ def add_cluster_label(df):
 
 def cluster_summary(df):
 
-    summary = (
+    return (
         df.groupby("cluster")
           .size()
           .reset_index(name="Jumlah Data")
+          .sort_values("cluster")
+          .reset_index(drop=True)
     )
-
-    return summary
 
 
 # =====================================================
@@ -114,7 +114,7 @@ def cluster_summary(df):
 
 def cluster_statistics(df):
 
-    statistik = (
+    return (
         df.groupby("Label")[
             [
                 "Total_harga",
@@ -127,6 +127,3 @@ def cluster_statistics(df):
         .round(2)
         .reset_index()
     )
-
-    return statistik
-
