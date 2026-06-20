@@ -15,6 +15,10 @@ def show_kelola_data():
 
     st.markdown("---")
 
+    # =====================================================
+    # UPLOAD DATASET
+    # =====================================================
+
     uploaded_file = st.file_uploader(
         "Upload Dataset (.csv / .xlsx)",
         type=["csv", "xlsx"]
@@ -24,54 +28,51 @@ def show_kelola_data():
 
         try:
 
-            # ============================================
-            # MEMBACA FILE
-            # ============================================
+            # -----------------------------
+            # Baca File
+            # -----------------------------
 
             if uploaded_file.name.lower().endswith(".csv"):
-
                 df = pd.read_csv(
                     uploaded_file,
                     sep=";"
                 )
-
             else:
-
                 df = pd.read_excel(
                     uploaded_file
                 )
 
-            # ============================================
-            # BERSIHKAN NAMA KOLOM
-            # ============================================
+            # -----------------------------
+            # Rapikan nama kolom
+            # -----------------------------
 
-            df.columns = df.columns.str.strip()
+            df.columns = (
+                df.columns
+                .str.strip()
+            )
 
-            # ============================================
-            # KONVERSI NUMERIK
-            # ============================================
+            # -----------------------------
+            # Konversi tipe data
+            # -----------------------------
 
-            if "Total_harga" in df.columns:
-                df["Total_harga"] = pd.to_numeric(
-                    df["Total_harga"],
-                    errors="coerce"
-                )
+            numeric_cols = [
+                "Total_harga",
+                "Jumlah_pesanan",
+                "rata_rata_harga"
+            ]
 
-            if "Jumlah_pesanan" in df.columns:
-                df["Jumlah_pesanan"] = pd.to_numeric(
-                    df["Jumlah_pesanan"],
-                    errors="coerce"
-                )
+            for col in numeric_cols:
 
-            if "rata_rata_harga" in df.columns:
-                df["rata_rata_harga"] = pd.to_numeric(
-                    df["rata_rata_harga"],
-                    errors="coerce"
-                )
+                if col in df.columns:
 
-            # ============================================
-            # BERSIHKAN WAKTU PERSIAPAN DIGUNAKAN
-            # ============================================
+                    df[col] = pd.to_numeric(
+                        df[col],
+                        errors="coerce"
+                    )
+
+            # -----------------------------
+            # Bersihkan waktu persiapan digunakan
+            # -----------------------------
 
             if "waktu_persiapan_digunakan" in df.columns:
 
@@ -86,29 +87,9 @@ def show_kelola_data():
                     errors="coerce"
                 )
 
-            # ============================================
-            # HANYA HAPUS DATA YANG KOSONG PADA
-            # EMPAT FITUR CLUSTERING
-            # ============================================
-
-            df = df.dropna(
-                subset=[
-                    "Total_harga",
-                    "Jumlah_pesanan",
-                    "rata_rata_harga",
-                    "waktu_persiapan_digunakan"
-                ]
-            )
-
-            # ============================================
-            # RESET INDEX
-            # ============================================
-
-            df = df.reset_index(drop=True)
-
-            # ============================================
-            # SIMPAN KE DATABASE
-            # ============================================
+            # -----------------------------
+            # Simpan TANPA menghapus kolom
+            # -----------------------------
 
             replace_all_data(df)
 
@@ -126,16 +107,16 @@ def show_kelola_data():
 
     st.markdown("---")
 
-    # ============================================
+    # =====================================================
     # TAMPILKAN DATA
-    # ============================================
+    # =====================================================
 
     df = get_all_data()
 
     if df.empty:
 
         st.info(
-            "Belum ada data."
+            "Belum ada data yang tersimpan."
         )
 
         return
@@ -147,15 +128,19 @@ def show_kelola_data():
         len(df)
     )
 
-    col2.metric(
-        "Total Omzet",
-        f"Rp {df['Total_harga'].sum():,.0f}"
-    )
+    if "Total_harga" in df.columns:
 
-    col3.metric(
-        "Total Item",
-        int(df["Jumlah_pesanan"].sum())
-    )
+        col2.metric(
+            "Total Omzet",
+            f"Rp {df['Total_harga'].fillna(0).sum():,.0f}"
+        )
+
+    if "Jumlah_pesanan" in df.columns:
+
+        col3.metric(
+            "Total Item",
+            int(df["Jumlah_pesanan"].fillna(0).sum())
+        )
 
     st.markdown("---")
 
@@ -171,13 +156,14 @@ def show_kelola_data():
 
     if st.button(
         "🗑️ Hapus Semua Data",
-        use_container_width=True
+        use_container_width=True,
+        type="secondary"
     ):
 
         delete_all_data()
 
         st.success(
-            "✅ Semua data berhasil dihapus."
+            "✅ Seluruh data berhasil dihapus."
         )
 
         st.rerun()
