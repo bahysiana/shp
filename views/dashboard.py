@@ -31,7 +31,7 @@ def show_dashboard():
         return
 
     # =====================================================
-    # PASTIKAN TIPE DATA NUMERIK
+    # KONVERSI KOLOM NUMERIK
     # =====================================================
 
     numeric_cols = [
@@ -42,11 +42,16 @@ def show_dashboard():
     ]
 
     for col in numeric_cols:
+
         if col in df.columns:
+
             df[col] = pd.to_numeric(
                 df[col],
                 errors="coerce"
             )
+
+    # Isi nilai kosong dengan 0
+    df[numeric_cols] = df[numeric_cols].fillna(0)
 
     # =====================================================
     # KPI
@@ -54,11 +59,11 @@ def show_dashboard():
 
     total_transaksi = len(df)
 
-    total_omzet = df["Total_harga"].fillna(0).sum()
+    total_omzet = df["Total_harga"].sum()
 
-    total_item = df["Jumlah_pesanan"].fillna(0).sum()
+    total_item = df["Jumlah_pesanan"].sum()
 
-    rata_harga = df["rata_rata_harga"].fillna(0).mean()
+    rata_harga = df["rata_rata_harga"].mean()
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -85,12 +90,12 @@ def show_dashboard():
     st.markdown("---")
 
     # =====================================================
-    # HISTOGRAM TOTAL HARGA
+    # HISTOGRAM
     # =====================================================
 
-    col_kiri, col_kanan = st.columns(2)
+    kiri, kanan = st.columns(2)
 
-    with col_kiri:
+    with kiri:
 
         fig_total = px.histogram(
             df,
@@ -104,7 +109,7 @@ def show_dashboard():
             use_container_width=True
         )
 
-    with col_kanan:
+    with kanan:
 
         fig_jumlah = px.histogram(
             df,
@@ -124,19 +129,45 @@ def show_dashboard():
     # SCATTER PLOT
     # =====================================================
 
-    fig_scatter = px.scatter(
-        df,
-        x="Jumlah_pesanan",
-        y="Total_harga",
-        size="rata_rata_harga",
-        hover_name="username",
-        title="Sebaran Transaksi"
+    scatter_df = df.copy()
+
+    # Hapus data yang tidak valid
+    scatter_df = scatter_df.dropna(
+        subset=[
+            "Jumlah_pesanan",
+            "Total_harga",
+            "rata_rata_harga"
+        ]
     )
 
-    st.plotly_chart(
-        fig_scatter,
-        use_container_width=True
-    )
+    # Hindari ukuran marker 0
+    scatter_df = scatter_df[
+        scatter_df["rata_rata_harga"] > 0
+    ]
+
+    if len(scatter_df) > 0:
+
+        fig_scatter = px.scatter(
+            scatter_df,
+            x="Jumlah_pesanan",
+            y="Total_harga",
+            size="rata_rata_harga",
+            hover_name="username"
+            if "username" in scatter_df.columns
+            else None,
+            title="Sebaran Transaksi"
+        )
+
+        st.plotly_chart(
+            fig_scatter,
+            use_container_width=True
+        )
+
+    else:
+
+        st.info(
+            "Data tidak cukup untuk menampilkan scatter plot."
+        )
 
     st.markdown("---")
 
@@ -151,3 +182,4 @@ def show_dashboard():
         use_container_width=True,
         hide_index=True
     )
+
