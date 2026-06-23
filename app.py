@@ -105,7 +105,7 @@ with st.sidebar:
 # ROUTING
 # ==========================
 
-if selected == "Dashboard":
+if selected == "Home":
 
     show_dashboard()
 
