@@ -7,10 +7,10 @@ from utils.database import get_all_data
 
 def show_dashboard():
 
-    st.title("📊 Dashboard")
+    st.title("📊 Home")
 
     st.write(
-        "Dashboard Analisis Pola Transaksi Shopee Food "
+        "Home Analisis Pola Transaksi Shopee Food "
         "menggunakan Metode K-Means Clustering."
     )
 
