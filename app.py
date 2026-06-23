@@ -11,7 +11,6 @@ from views.preprocessing_view import show_preprocessing
 from views.kmeans import show_kmeans
 from views.hasil import show_hasil
 from views.download import show_download
-from views.tentang import show_tentang
 
 # ==========================
 # KONFIGURASI
@@ -63,8 +62,7 @@ with st.sidebar:
             "Preprocessing",
             "K-Means",
             "Hasil",
-            "Download",
-            "Tentang"
+            "Download"
         ],
         icons=[
             "house-fill",
@@ -131,7 +129,4 @@ elif selected == "Download":
 
     show_download()
 
-elif selected == "Tentang":
-
-    show_tentang()
 
