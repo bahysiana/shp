@@ -57,7 +57,7 @@ with st.sidebar:
     selected = option_menu(
         menu_title="🧭 Navigasi",
         options=[
-            "Dashboard",
+            "Home",
             "Kelola Data",
             "Preprocessing",
             "K-Means",
@@ -70,8 +70,7 @@ with st.sidebar:
             "sliders",
             "bullseye",
             "bar-chart-fill",
-            "download",
-            "info-circle-fill"
+            "download"
         ],
         default_index=0
     )
