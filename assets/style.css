@@ -1,181 +1,319 @@
-/* ==========================================================
-   SHOPEE FOOD ANALYTICS - STYLE.CSS
-   FINAL VERSION
-========================================================== */
+/* ===========================================================
+   SHOPEE FOOD ANALYTICS
+   Buffet The Padang Pasir
+=========================================================== */
 
-/* =========================
+/* ==========================
    GLOBAL
-========================= */
+========================== */
 
-.stApp {
-    background-color: #F5F7FB;
+.stApp{
+    background:#F8F9FA;
 }
 
-.block-container {
-    padding-top: 1.5rem;
-    padding-bottom: 2rem;
+.block-container{
+    padding-top:25px;
+    padding-bottom:40px;
+    max-width:1300px;
 }
 
-/* =========================
+/* ==========================
    SIDEBAR
-========================= */
+========================== */
 
-[data-testid="stSidebar"] {
-    background: #FFFFFF;
-    border-right: 1px solid #EAEAEA;
+[data-testid="stSidebar"]{
+    background:#FFFFFF;
+    border-right:1px solid #ECECEC;
 }
 
-[data-testid="stSidebarContent"] {
-    padding: 20px 18px;
+[data-testid="stSidebarContent"]{
+    padding:25px 18px;
 }
 
-/* =========================
+/* ==========================
    OPTION MENU
-========================= */
+========================== */
 
-.nav-link {
-    margin: 14px 0 !important;
-    padding: 14px 12px !important;
-    border-radius: 14px !important;
-    background: linear-gradient(
-        90deg,
-        #1D6FE8,
-        #10C8B5
-    ) !important;
-    color: #FFFFFF !important;
-    text-align: center !important;
-    font-weight: 600 !important;
-    transition: all 0.25s ease !important;
+.nav-link{
+
+    margin:8px 0 !important;
+
+    border-radius:12px !important;
+
+    padding:14px !important;
+
+    color:#444 !important;
+
+    font-weight:600 !important;
+
+    transition:0.25s;
+
 }
 
-.nav-link:hover {
-    transform: scale(1.02);
-    filter: brightness(0.97);
+.nav-link:hover{
+
+    background:#FFF3F0 !important;
+
+    color:#EE4D2D !important;
+
 }
 
-.nav-link-selected {
-    background: linear-gradient(
-        90deg,
-        #165ED0,
-        #0BAA9B
-    ) !important;
-    color: #FFFFFF !important;
+.nav-link-selected{
+
+    background:#EE4D2D !important;
+
+    color:white !important;
+
 }
 
-/* =========================
-   BUTTON
-========================= */
-
-.stButton > button {
-    width: 100%;
-    border-radius: 14px;
-    border: none;
-    font-weight: 600;
-}
-
-/* =========================
-   DOWNLOAD BUTTON
-========================= */
-
-.stDownloadButton > button {
-    width: 100%;
-    border-radius: 14px;
-    border: none;
-    font-weight: 600;
-}
-
-/* =========================
-   METRIC
-========================= */
-
-[data-testid="metric-container"] {
-    background: #FFFFFF;
-    border: 1px solid #ECECEC;
-    border-radius: 18px;
-    padding: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-/* =========================
-   DATAFRAME
-========================= */
-
-[data-testid="stDataFrame"] {
-    border-radius: 14px;
-    overflow: hidden;
-    border: 1px solid #ECECEC;
-}
-
-/* =========================
-   FILE UPLOADER
-========================= */
-
-[data-testid="stFileUploader"] {
-    border-radius: 14px;
-    border: 2px dashed #CBD5E1;
-    padding: 10px;
-}
-
-/* =========================
-   INPUT
-========================= */
-
-.stTextInput input,
-.stNumberInput input,
-textarea {
-    border-radius: 10px !important;
-}
-
-/* =========================
-   PROGRESS BAR
-========================= */
-
-.stProgress > div > div {
-    background: linear-gradient(
-        90deg,
-        #1D6FE8,
-        #10C8B5
-    );
-}
-
-/* =========================
-   TABS
-========================= */
-
-button[role="tab"] {
-    border-radius: 10px;
-    font-weight: 600;
-}
-
-/* =========================
+/* ==========================
    TITLE
-========================= */
+========================== */
 
-h1 {
-    color: #1F2937;
-    font-weight: 700;
+h1{
+
+    color:#1F2937;
+
+    font-weight:700;
+
 }
 
-h2 {
-    color: #1F2937;
-    font-weight: 700;
+h2{
+
+    color:#1F2937;
+
+    font-weight:700;
+
 }
 
-h3 {
-    color: #374151;
-    font-weight: 600;
+h3{
+
+    color:#374151;
+
+    font-weight:600;
+
 }
 
-/* =========================
+/* ==========================
+   METRIC CARD
+========================== */
+
+.metric-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    border:1px solid #ECECEC;
+
+    box-shadow:0 6px 18px rgba(0,0,0,.05);
+
+    transition:.25s;
+
+    text-align:center;
+
+    margin-bottom:15px;
+
+}
+
+.metric-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 12px 24px rgba(0,0,0,.08);
+
+}
+
+.metric-icon{
+
+    font-size:34px;
+
+    margin-bottom:10px;
+
+}
+
+.metric-value{
+
+    font-size:30px;
+
+    font-weight:700;
+
+    color:#EE4D2D;
+
+}
+
+.metric-title{
+
+    color:#6B7280;
+
+    font-size:15px;
+
+}
+
+/* ==========================
+   INFO CARD
+========================== */
+
+.info-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    border:1px solid #ECECEC;
+
+    box-shadow:0 6px 18px rgba(0,0,0,.05);
+
+    margin-bottom:15px;
+
+}
+
+.info-card h4{
+
+    margin-bottom:10px;
+
+    color:#1F2937;
+
+}
+
+.info-card p{
+
+    color:#6B7280;
+
+    line-height:1.8;
+
+}
+
+/* ==========================
+   BUTTON
+========================== */
+
+.stButton button{
+
+    background:#EE4D2D;
+
+    color:white;
+
+    border:none;
+
+    border-radius:12px;
+
+    height:48px;
+
+    font-weight:600;
+
+    transition:.2s;
+
+}
+
+.stButton button:hover{
+
+    background:#D84315;
+
+    color:white;
+
+}
+
+/* ==========================
+   DOWNLOAD BUTTON
+========================== */
+
+.stDownloadButton button{
+
+    background:#EE4D2D;
+
+    color:white;
+
+    border:none;
+
+    border-radius:12px;
+
+    height:48px;
+
+    font-weight:600;
+
+}
+
+.stDownloadButton button:hover{
+
+    background:#D84315;
+
+}
+
+/* ==========================
+   DATAFRAME
+========================== */
+
+[data-testid="stDataFrame"]{
+
+    border-radius:16px;
+
+    border:1px solid #ECECEC;
+
+    overflow:hidden;
+
+}
+
+/* ==========================
+   FILE UPLOADER
+========================== */
+
+[data-testid="stFileUploader"]{
+
+    border-radius:14px;
+
+    border:2px dashed #EE4D2D;
+
+    background:white;
+
+}
+
+/* ==========================
+   METRIC STREAMLIT
+========================== */
+
+[data-testid="metric-container"]{
+
+    background:white;
+
+    border-radius:18px;
+
+    border:1px solid #ECECEC;
+
+    box-shadow:0 6px 18px rgba(0,0,0,.05);
+
+}
+
+/* ==========================
+   TABS
+========================== */
+
+button[role="tab"]{
+
+    border-radius:12px;
+
+    font-weight:600;
+
+}
+
+/* ==========================
    SCROLLBAR
-========================= */
+========================== */
 
-::-webkit-scrollbar {
-    width: 8px;
+::-webkit-scrollbar{
+
+    width:8px;
+
 }
 
-::-webkit-scrollbar-thumb {
-    background: #C7D2FE;
-    border-radius: 10px;
-}
+::-webkit-scrollbar-thumb{
 
+    background:#EE4D2D;
+
+    border-radius:20px;
+
+}
