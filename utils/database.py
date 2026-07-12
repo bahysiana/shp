@@ -2,36 +2,56 @@ import sqlite3
 from pathlib import Path
 import pandas as pd
 
-# =====================================================
+# ==========================================================
 # PATH DATABASE
-# =====================================================
+# ==========================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DB_DIR = BASE_DIR / "database"
-DB_DIR.mkdir(parents=True, exist_ok=True)
+
+DB_DIR.mkdir(
+    parents=True,
+    exist_ok=True
+)
 
 DB_PATH = DB_DIR / "shopee_food.db"
 
 
-# =====================================================
+# ==========================================================
 # KONEKSI DATABASE
-# =====================================================
+# ==========================================================
 
 def get_connection():
-    return sqlite3.connect(DB_PATH)
+    """
+    Membuat koneksi ke database SQLite.
+    """
+
+    conn = sqlite3.connect(
+        DB_PATH,
+        check_same_thread=False
+    )
+
+    conn.row_factory = sqlite3.Row
+
+    return conn
 
 
-# =====================================================
+# ==========================================================
 # MEMBUAT TABEL
-# =====================================================
+# ==========================================================
 
 def create_table():
+    """
+    Membuat tabel transaksi apabila belum tersedia.
+    """
 
     conn = get_connection()
+
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS transaksi (
 
             no INTEGER,
@@ -50,30 +70,38 @@ def create_table():
 
             waktu_persiapan_yang_diberikan INTEGER,
 
-            waktu_persiapan_digunakan REAL,
+            waktu_persiapan_digunakan INTEGER,
 
             waktu_pesan TEXT
 
         )
-    """)
+        """
+    )
 
     conn.commit()
+
     conn.close()
 
 
-# =====================================================
-# AMBIL SEMUA DATA
-# =====================================================
+# ==========================================================
+# MENGAMBIL SELURUH DATA
+# ==========================================================
 
 def get_all_data():
+    """
+    Mengambil seluruh data transaksi dari database.
+    """
 
     conn = get_connection()
 
     try:
 
         df = pd.read_sql_query(
+
             "SELECT * FROM transaksi",
+
             conn
+
         )
 
     except Exception:
@@ -87,87 +115,34 @@ def get_all_data():
     return df
 
 
-# =====================================================
-# GANTI SELURUH DATA
-# =====================================================
+# ==========================================================
+# MENGGANTI SELURUH DATA
+# ==========================================================
 
 def replace_all_data(df):
-
-    conn = get_connection()
-
-    try:
-
-        conn.execute("DELETE FROM transaksi")
-
-        df.to_sql(
-            "transaksi",
-            conn,
-            if_exists="append",
-            index=False
-        )
-
-        conn.commit()
-
-    finally:
-
-        conn.close()
-
-
-# =====================================================
-# TAMBAH DATAFRAME
-# =====================================================
-
-def insert_dataframe(df):
-
-    conn = get_connection()
-
-    try:
-
-        df.to_sql(
-            "transaksi",
-            conn,
-            if_exists="append",
-            index=False
-        )
-
-        conn.commit()
-
-    finally:
-
-        conn.close()
-
-
-# =====================================================
-# HAPUS SEMUA DATA
-# =====================================================
-
-def delete_all_data():
-
-    conn = get_connection()
-
-    try:
-
-        conn.execute("DELETE FROM transaksi")
-        conn.commit()
-
-    finally:
-
-        conn.close()
-
-
-# =====================================================
-# HAPUS BERDASARKAN NOMOR
-# =====================================================
-
-def delete_by_no(no):
+    """
+    Menghapus seluruh data lama kemudian
+    menggantinya dengan dataset baru.
+    """
 
     conn = get_connection()
 
     try:
 
         conn.execute(
-            "DELETE FROM transaksi WHERE no=?",
-            (no,)
+            "DELETE FROM transaksi"
+        )
+
+        df.to_sql(
+
+            "transaksi",
+
+            conn,
+
+            if_exists="append",
+
+            index=False
+
         )
 
         conn.commit()
@@ -177,11 +152,38 @@ def delete_by_no(no):
         conn.close()
 
 
-# =====================================================
+# ==========================================================
+# MENGHAPUS SELURUH DATA
+# ==========================================================
+
+def delete_all_data():
+    """
+    Menghapus seluruh data transaksi.
+    """
+
+    conn = get_connection()
+
+    try:
+
+        conn.execute(
+            "DELETE FROM transaksi"
+        )
+
+        conn.commit()
+
+    finally:
+
+        conn.close()
+
+
+# ==========================================================
 # TOTAL DATA
-# =====================================================
+# ==========================================================
 
 def get_total_data():
+    """
+    Menghitung jumlah seluruh transaksi.
+    """
 
     conn = get_connection()
 
@@ -198,11 +200,14 @@ def get_total_data():
     return total
 
 
-# =====================================================
+# ==========================================================
 # TOTAL OMZET
-# =====================================================
+# ==========================================================
 
 def get_total_omzet():
+    """
+    Menghitung total omzet transaksi.
+    """
 
     conn = get_connection()
 
@@ -225,8 +230,8 @@ def get_total_omzet():
     return total
 
 
-# =====================================================
+# ==========================================================
 # INISIALISASI DATABASE
-# =====================================================
+# ==========================================================
 
 create_table()
