@@ -1,112 +1,115 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 
-# ==========================
+# ======================================================
 # IMPORT HALAMAN
-# ==========================
+# ======================================================
 
-from views.dashboard import show_dashboard
+from views.home import show_home
 from views.kelola_data import show_kelola_data
-from views.preprocessing_view import show_preprocessing
-from views.kmeans import show_kmeans
-from views.hasil import show_hasil
+from views.preprocessing import show_preprocessing
+from views.clustering import show_clustering
 from views.download import show_download
 
-# ==========================
+# ======================================================
 # KONFIGURASI
-# ==========================
+# ======================================================
 
 st.set_page_config(
-    page_title="Shopee Food Analytics",
+    page_title="Analisis Pola Transaksi Shopee Food",
     page_icon="🍽️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ==========================
+# ======================================================
 # LOAD CSS
-# ==========================
+# ======================================================
 
 try:
-    with open("assets/style.css", "r", encoding="utf-8") as f:
+
+    with open(
+        "assets/style.css",
+        encoding="utf-8"
+    ) as css:
+
         st.markdown(
-            f"<style>{f.read()}</style>",
+            f"<style>{css.read()}</style>",
             unsafe_allow_html=True
         )
+
 except FileNotFoundError:
     pass
 
-# ==========================
+# ======================================================
 # SIDEBAR
-# ==========================
+# ======================================================
 
 with st.sidebar:
 
     st.markdown(
         """
-        <div style="text-align:center; margin-bottom:20px;">
-            <h2>🍽️ Shopee Food</h2>
-            <p style="color:gray;">
-                Analytics Dashboard
+        <div style="text-align:center;padding-bottom:15px;">
+
+            <h2 style="margin-bottom:5px;">
+                🍽️
+            </h2>
+
+            <h3 style="margin-bottom:5px;">
+                Buffet The Padang Pasir
+            </h3>
+
+            <p style="color:#6B7280;font-size:14px;">
+                Analisis Pola Transaksi Shopee Food
             </p>
+
         </div>
         """,
         unsafe_allow_html=True
     )
 
     selected = option_menu(
-        menu_title="🧭 Navigasi",
+
+        menu_title=None,
+
         options=[
             "Home",
             "Kelola Data",
             "Preprocessing",
-            "K-Means",
-            "Hasil",
+            "Clustering",
             "Download"
         ],
+
         icons=[
             "house-fill",
             "database-fill",
             "sliders",
-            "bullseye",
             "bar-chart-fill",
             "download"
         ],
+
         default_index=0
+
     )
 
-    st.markdown("---")
-
-    progress = 10
-
-    if "scaled_df" in st.session_state:
-        progress = 60
-
-    if "hasil_cluster" in st.session_state:
-        progress = 100
-
-    st.markdown("### 📈 Progress")
-    st.progress(progress)
-    st.caption(f"{progress}%")
-
-    st.markdown("---")
+    st.divider()
 
     if st.button(
-        "🔄 Reset Session",
+        "🔄 Reset Analisis",
         use_container_width=True
     ):
-        keys = list(st.session_state.keys())
-        for key in keys:
-            del st.session_state[key]
+
+        st.session_state.clear()
+
         st.rerun()
 
-# ==========================
+# ======================================================
 # ROUTING
-# ==========================
+# ======================================================
 
 if selected == "Home":
 
-    show_dashboard()
+    show_home()
 
 elif selected == "Kelola Data":
 
@@ -116,16 +119,10 @@ elif selected == "Preprocessing":
 
     show_preprocessing()
 
-elif selected == "K-Means":
+elif selected == "Clustering":
 
-    show_kmeans()
-
-elif selected == "Hasil":
-
-    show_hasil()
+    show_clustering()
 
 elif selected == "Download":
 
     show_download()
-
-
