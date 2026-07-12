@@ -387,3 +387,219 @@ melalui menu **Preprocessing**.
     )
 
     st.divider()
+        # ======================================================
+    # KARAKTERISTIK CLUSTER
+    # ======================================================
+
+    section_title(
+
+        "📊 Karakteristik Tiap Cluster",
+
+        "Nilai rata-rata setiap variabel pada masing-masing cluster."
+
+    )
+
+    statistik_tampil = statistik.copy()
+
+    statistik_tampil = statistik_tampil.rename(
+
+        columns={
+
+            "Nama Cluster":
+                "Cluster",
+
+            "Total_harga":
+                "Total Harga",
+
+            "Jumlah_pesanan":
+                "Jumlah Pesanan",
+
+            "Jumlah_jenis_menu":
+                "Jumlah Jenis Menu",
+
+            "waktu_persiapan_yang_diberikan":
+                "Estimasi Persiapan (Menit)",
+
+            "waktu_persiapan_digunakan":
+                "Waktu Persiapan (Menit)"
+
+        }
+
+    )
+
+    st.dataframe(
+
+        statistik_tampil,
+
+        use_container_width=True,
+
+        hide_index=True
+
+    )
+
+    st.divider()
+
+    # ======================================================
+    # DETAIL DATA TRANSAKSI
+    # ======================================================
+
+    section_title(
+
+        "📄 Detail Data Transaksi",
+
+        "Menampilkan data transaksi beserta hasil pengelompokan."
+
+    )
+
+    col1, col2 = st.columns([3,1])
+
+    with col1:
+
+        keyword = st.text_input(
+
+            "🔍 Cari Username atau Menu",
+
+            placeholder="Masukkan username atau nama menu..."
+
+        )
+
+    with col2:
+
+        jumlah_data = st.selectbox(
+
+            "Jumlah Data",
+
+            [
+
+                10,
+
+                25,
+
+                50,
+
+                100
+
+            ],
+
+            index=0
+
+        )
+
+    hasil_tampil = hasil.copy()
+
+    # ======================================================
+    # FILTER DATA
+    # ======================================================
+
+    if keyword:
+
+        keyword = keyword.lower()
+
+        kolom_pencarian = []
+
+        if "username" in hasil_tampil.columns:
+
+            kolom_pencarian.append(
+                "username"
+            )
+
+        if "menu_yang_dibeli" in hasil_tampil.columns:
+
+            kolom_pencarian.append(
+                "menu_yang_dibeli"
+            )
+
+        if kolom_pencarian:
+
+            mask = pd.Series(
+                False,
+                index=hasil_tampil.index
+            )
+
+            for kolom in kolom_pencarian:
+
+                mask = (
+
+                    mask
+
+                    |
+
+                    hasil_tampil[kolom]
+
+                    .astype(str)
+
+                    .str.lower()
+
+                    .str.contains(
+
+                        keyword,
+
+                        na=False
+
+                    )
+
+                )
+
+            hasil_tampil = hasil_tampil[mask]
+
+    st.caption(
+
+        f"Menampilkan {min(len(hasil_tampil), jumlah_data)} dari {len(hasil_tampil)} transaksi."
+
+    )
+
+    urutan_kolom = [
+
+        "no",
+
+        "username",
+
+        "menu_yang_dibeli",
+
+        "Total_harga",
+
+        "Jumlah_pesanan",
+
+        "Jumlah_jenis_menu",
+
+        "waktu_persiapan_digunakan",
+
+        "Cluster",
+
+        "Nama Cluster"
+
+    ]
+
+    kolom_tampil = [
+
+        kolom
+
+        for kolom in urutan_kolom
+
+        if kolom in hasil_tampil.columns
+
+    ]
+
+    st.dataframe(
+
+        hasil_tampil[kolom_tampil]
+
+        .head(jumlah_data),
+
+        use_container_width=True,
+
+        hide_index=True
+
+    )
+
+    st.divider()
+
+    # ======================================================
+    # INFORMASI AKHIR
+    # ======================================================
+
+    success_card(
+
+        "Clustering selesai. Hasil analisis telah disimpan dan siap diunduh melalui menu Download."
+
+    )
