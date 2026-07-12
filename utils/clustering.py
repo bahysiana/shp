@@ -1,33 +1,14 @@
 import pandas as pd
-
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
-
 
 # =====================================================
-# ELBOW METHOD
+# NAMA CLUSTER
 # =====================================================
 
-def elbow_method(data, max_k=10):
-
-    wcss = []
-
-    for k in range(1, max_k + 1):
-
-        model = KMeans(
-            n_clusters=k,
-            random_state=42,
-            n_init=10
-        )
-
-        model.fit(data)
-
-        wcss.append(model.inertia_)
-
-    return pd.DataFrame({
-        "K": range(1, max_k + 1),
-        "WCSS": wcss
-    })
+CLUSTER_LABELS = {
+    0: "Pola Transaksi dengan Beban Pelayanan Tinggi",
+    1: "Pola Transaksi dengan Beban Pelayanan Rendah"
+}
 
 
 # =====================================================
@@ -37,7 +18,7 @@ def elbow_method(data, max_k=10):
 def run_kmeans(data):
 
     model = KMeans(
-        n_clusters=3,
+        n_clusters=2,
         random_state=42,
         n_init=10
     )
@@ -53,15 +34,6 @@ def run_kmeans(data):
 
 
 # =====================================================
-# SILHOUETTE SCORE
-# =====================================================
-
-def calculate_silhouette(data, labels):
-
-    return silhouette_score(data, labels)
-
-
-# =====================================================
 # TAMBAHKAN HASIL CLUSTER
 # =====================================================
 
@@ -69,35 +41,20 @@ def add_cluster_result(df, labels):
 
     hasil = df.copy()
 
-    hasil["cluster"] = labels
+    hasil["Cluster"] = labels
 
     return hasil
 
 
 # =====================================================
-# LABEL CLUSTER OTOMATIS
+# TAMBAHKAN LABEL CLUSTER
 # =====================================================
 
 def add_cluster_label(df):
 
     hasil = df.copy()
 
-    # Hitung rata-rata jumlah pesanan setiap cluster
-    ranking = (
-        hasil.groupby("cluster")["Jumlah_pesanan"]
-        .mean()
-        .sort_values()
-    )
-
-    urutan_cluster = ranking.index.tolist()
-
-    mapping = {
-        urutan_cluster[0]: "Pola Pemesanan Personal",
-        urutan_cluster[1]: "Pola Pemesanan Reguler",
-        urutan_cluster[2]: "Pola Pemesanan Kelompok"
-    }
-
-    hasil["Label"] = hasil["cluster"].map(mapping)
+    hasil["Nama Cluster"] = hasil["Cluster"].map(CLUSTER_LABELS)
 
     return hasil
 
@@ -108,11 +65,19 @@ def add_cluster_label(df):
 
 def cluster_summary(df):
 
-    return (
-        df.groupby("Label")
+    summary = (
+        df.groupby(["Cluster", "Nama Cluster"])
         .size()
         .reset_index(name="Jumlah Data")
     )
+
+    total = summary["Jumlah Data"].sum()
+
+    summary["Persentase (%)"] = (
+        summary["Jumlah Data"] / total * 100
+    ).round(2)
+
+    return summary
 
 
 # =====================================================
@@ -121,12 +86,13 @@ def cluster_summary(df):
 
 def cluster_statistics(df):
 
-    return (
-        df.groupby("Label")[
+    statistik = (
+        df.groupby(["Cluster", "Nama Cluster"])[
             [
                 "Total_harga",
                 "Jumlah_pesanan",
-                "rata_rata_harga",
+                "Jumlah_jenis_menu",
+                "waktu_persiapan_yang_diberikan",
                 "waktu_persiapan_digunakan"
             ]
         ]
@@ -135,3 +101,4 @@ def cluster_statistics(df):
         .reset_index()
     )
 
+    return statistik
