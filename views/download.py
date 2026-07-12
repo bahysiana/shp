@@ -5,7 +5,8 @@ import pandas as pd
 from utils.components import (
     section_title,
     info_card,
-    success_card
+    success_card,
+    metric_card
 )
 
 from utils.report import generate_pdf
@@ -16,6 +17,10 @@ from utils.report import generate_pdf
 # ==========================================================
 
 def show_download():
+
+    # ======================================================
+    # HEADER
+    # ======================================================
 
     section_title(
         "📄 Download Laporan",
@@ -28,13 +33,32 @@ def show_download():
     # VALIDASI
     # ======================================================
 
-    if "hasil_cluster" not in st.session_state:
+    required_session = [
 
-        st.warning(
-            "Silakan lakukan proses Clustering terlebih dahulu."
-        )
+        "hasil_cluster",
 
-        return
+        "summary_cluster",
+
+        "cluster_statistics"
+
+    ]
+
+    for key in required_session:
+
+        if key not in st.session_state:
+
+            info_card(
+
+                "Analisis Belum Tersedia",
+
+                """
+Silakan lakukan proses Clustering terlebih dahulu
+agar laporan dapat dibuat.
+                """
+
+            )
+
+            return
 
     hasil = st.session_state["hasil_cluster"]
 
@@ -43,24 +67,66 @@ def show_download():
     statistik = st.session_state["cluster_statistics"]
 
     # ======================================================
-    # PDF
+    # RINGKASAN
+    # ======================================================
+
+    section_title(
+        "📊 Ringkasan Hasil"
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        metric_card(
+
+            "Total Transaksi",
+
+            len(hasil),
+
+            "📦"
+
+        )
+
+    with col2:
+
+        metric_card(
+
+            "Jumlah Cluster",
+
+            2,
+
+            "📊"
+
+        )
+
+    st.divider()
+
+    # ======================================================
+    # DOWNLOAD PDF
     # ======================================================
 
     info_card(
+
         "Laporan PDF",
+
         """
 Laporan PDF berisi:
 
 • Ringkasan hasil analisis
 
-• Hasil pengelompokan transaksi
-
 • Karakteristik setiap cluster
+
+• Penjelasan hasil clustering
+
+• Kesimpulan
 
 • Rekomendasi operasional
 
-Laporan dibuat sederhana sehingga mudah dipahami oleh pihak toko.
+Laporan dirancang sederhana sehingga mudah dipahami
+oleh pihak Toko Buffet The Padang Pasir.
         """
+
     )
 
     pdf_buffer = generate_pdf(
@@ -90,22 +156,34 @@ Laporan dibuat sederhana sehingga mudah dipahami oleh pihak toko.
     st.divider()
 
     # ======================================================
-    # EXCEL
+    # DOWNLOAD EXCEL
     # ======================================================
 
     info_card(
+
         "Dataset Excel",
+
         """
-File Excel berisi seluruh data transaksi beserta hasil clustering
-dan statistik setiap cluster.
+File Excel berisi:
+
+• Data hasil clustering
+
+• Statistik setiap cluster
+
+File ini dapat digunakan untuk analisis lanjutan
+atau dokumentasi penelitian.
         """
+
     )
 
     excel_buffer = io.BytesIO()
 
     with pd.ExcelWriter(
+
         excel_buffer,
+
         engine="openpyxl"
+
     ) as writer:
 
         hasil.to_excel(
@@ -124,7 +202,7 @@ dan statistik setiap cluster.
 
             index=False,
 
-            sheet_name="Statistik Cluster"
+            sheet_name="Statistik"
 
         )
 
@@ -132,7 +210,7 @@ dan statistik setiap cluster.
 
     st.download_button(
 
-        label="📊 Download Excel",
+        label="📊 Download Hasil Excel",
 
         data=excel_buffer,
 
@@ -146,6 +224,12 @@ dan statistik setiap cluster.
 
     st.divider()
 
+    # ======================================================
+    # INFORMASI AKHIR
+    # ======================================================
+
     success_card(
+
         "Laporan analisis siap diunduh."
+
     )
