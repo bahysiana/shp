@@ -71,7 +71,7 @@ center_style.fontSize = 10
 
 
 # ==========================================================
-# MEMBUAT TABEL
+# MEMBUAT STYLE TABEL
 # ==========================================================
 
 def create_table(data):
@@ -106,6 +106,13 @@ def create_table(data):
                 ),
 
                 (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    9
+                ),
+
+                (
                     "GRID",
                     (0, 0),
                     (-1, -1),
@@ -128,6 +135,13 @@ def create_table(data):
                 ),
 
                 (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+
+                (
                     "BOTTOMPADDING",
                     (0, 0),
                     (-1, 0),
@@ -144,13 +158,15 @@ def create_table(data):
 
 
 # ==========================================================
-# MEMBUAT PDF
+# GENERATE PDF
 # ==========================================================
 
 def generate_pdf(
+
     hasil,
     summary,
     statistik
+
 ):
 
     buffer = io.BytesIO()
@@ -161,9 +177,9 @@ def generate_pdf(
 
         pagesize=(21 * cm, 29.7 * cm),
 
-        rightMargin=1.8 * cm,
-
         leftMargin=1.8 * cm,
+
+        rightMargin=1.8 * cm,
 
         topMargin=1.8 * cm,
 
@@ -177,6 +193,36 @@ def generate_pdf(
 
     info = get_cluster_information(
         summary
+    )
+
+    # ======================================================
+    # UBAH NAMA KOLOM
+    # ======================================================
+
+    statistik = statistik.rename(
+
+        columns={
+
+            "Nama Cluster":
+                "Cluster",
+
+            "Total_harga":
+                "Total Harga",
+
+            "Jumlah_pesanan":
+                "Jumlah Pesanan",
+
+            "Jumlah_jenis_menu":
+                "Jumlah Jenis Menu",
+
+            "waktu_persiapan_yang_diberikan":
+                "Estimasi Persiapan (Menit)",
+
+            "waktu_persiapan_digunakan":
+                "Waktu Persiapan (Menit)"
+
+        }
+
     )
 
     # ======================================================
@@ -257,13 +303,13 @@ def generate_pdf(
         ],
 
         [
-            "Cluster Beban Pelayanan Tinggi",
-            f"{info['tinggi']['jumlah']} Transaksi"
+            "Beban Pelayanan Tinggi",
+            f"{info['tinggi']['jumlah']} Transaksi ({info['tinggi']['persentase']:.2f}%)"
         ],
 
         [
-            "Cluster Beban Pelayanan Rendah",
-            f"{info['rendah']['jumlah']} Transaksi"
+            "Beban Pelayanan Rendah",
+            f"{info['rendah']['jumlah']} Transaksi ({info['rendah']['persentase']:.2f}%)"
         ]
 
     ]
@@ -273,28 +319,45 @@ def generate_pdf(
     )
 
     elements.append(
-        Spacer(1, 0.6 * cm)
+        Spacer(1, 0.5 * cm)
+    )
+
+    elements.append(
+
+        Paragraph(
+
+            """
+            Berdasarkan hasil analisis menggunakan metode K-Means Clustering,
+            transaksi Shopee Food berhasil dikelompokkan menjadi dua karakteristik
+            utama yaitu transaksi dengan beban pelayanan tinggi dan transaksi
+            dengan beban pelayanan rendah.
+            """,
+
+            normal_style
+
+        )
+
+    )
+
+    elements.append(
+        Spacer(1, 0.5 * cm)
     )
 
     # ======================================================
-    # KARAKTERISTIK CLUSTER
+    # TABEL KARAKTERISTIK
     # ======================================================
 
     elements.append(
 
         Paragraph(
 
-            "Karakteristik Tiap Cluster",
+            "Rata-rata Karakteristik Tiap Cluster",
 
             subtitle_style
 
         )
 
     )
-
-    # ---------------------------------------------
-    # Format tabel agar angka lebih rapi
-    # ---------------------------------------------
 
     table_data = [
 
@@ -355,8 +418,7 @@ def generate_pdf(
 
         Paragraph(
 
-            f"<b>{info['tinggi']['cluster']}</b><br/><br/>"
-            f"{interpretasi['tinggi']['description']}",
+            "<b>Pola Transaksi dengan Beban Pelayanan Tinggi</b>",
 
             normal_style
 
@@ -365,15 +427,38 @@ def generate_pdf(
     )
 
     elements.append(
-        Spacer(1, 0.4 * cm)
+
+        Paragraph(
+
+            interpretasi["tinggi"]["description"],
+
+            normal_style
+
+        )
+
+    )
+
+    elements.append(
+        Spacer(1, 0.5 * cm)
     )
 
     elements.append(
 
         Paragraph(
 
-            f"<b>{info['rendah']['cluster']}</b><br/><br/>"
-            f"{interpretasi['rendah']['description']}",
+            "<b>Pola Transaksi dengan Beban Pelayanan Rendah</b>",
+
+            normal_style
+
+        )
+
+    )
+
+    elements.append(
+
+        Paragraph(
+
+            interpretasi["rendah"]["description"],
 
             normal_style
 
@@ -433,16 +518,13 @@ def generate_pdf(
 
     )
 
-    for i, rekomendasi in enumerate(
-        interpretasi["rekomendasi"],
-        start=1
-    ):
+    for rekomendasi in interpretasi["rekomendasi"]:
 
         elements.append(
 
             Paragraph(
 
-                f"{i}. {rekomendasi}",
+                f"• {rekomendasi}",
 
                 normal_style
 
@@ -451,7 +533,7 @@ def generate_pdf(
         )
 
     elements.append(
-        Spacer(1, 0.7 * cm)
+        Spacer(1, 0.8 * cm)
     )
 
     # ======================================================
@@ -463,15 +545,32 @@ def generate_pdf(
         Paragraph(
 
             """
-Laporan ini dihasilkan secara otomatis oleh sistem Analisis Pola Transaksi
-Shopee Food menggunakan metode K-Means Clustering.
+            Laporan ini dihasilkan secara otomatis oleh aplikasi Analisis
+            Pola Transaksi Shopee Food menggunakan metode K-Means Clustering.
 
-Laporan ini bertujuan membantu pihak Toko Buffet The Padang Pasir
-dalam memahami karakteristik transaksi serta menentukan prioritas
-pelayanan berdasarkan hasil analisis data transaksi.
+            Hasil analisis ini diharapkan dapat membantu pihak Toko Buffet
+            The Padang Pasir dalam memahami karakteristik transaksi serta
+            menentukan prioritas pelayanan untuk meningkatkan efisiensi
+            operasional.
             """,
 
             normal_style
+
+        )
+
+    )
+
+    elements.append(
+        Spacer(1, 1 * cm)
+    )
+
+    elements.append(
+
+        Paragraph(
+
+            "—— Selesai ——",
+
+            center_style
 
         )
 
