@@ -1,13 +1,12 @@
 import streamlit as st
 
-
 # ==========================================================
-# JUDUL SECTION
+# SECTION TITLE
 # ==========================================================
 
 def section_title(title, subtitle=None):
     """
-    Menampilkan judul section yang konsisten.
+    Menampilkan judul section.
     """
 
     st.markdown(
@@ -32,10 +31,36 @@ def section_title(title, subtitle=None):
 
 
 # ==========================================================
+# HERO CARD
+# ==========================================================
+
+def hero_card(title, subtitle):
+    """
+    Banner utama pada halaman Home.
+    """
+
+    st.markdown(
+        f"""
+        <div class="hero-card">
+
+            <h2>{title}</h2>
+
+            <p>{subtitle}</p>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+# ==========================================================
 # METRIC CARD
 # ==========================================================
 
 def metric_card(title, value, icon="📊"):
+    """
+    Card untuk menampilkan informasi singkat.
+    """
 
     st.markdown(
         f"""
@@ -64,6 +89,9 @@ def metric_card(title, value, icon="📊"):
 # ==========================================================
 
 def info_card(title, content):
+    """
+    Card informasi.
+    """
 
     st.markdown(
         f"""
@@ -77,37 +105,92 @@ def info_card(title, content):
         """,
         unsafe_allow_html=True
     )
-    # ==========================================================
-# HERO CARD
+
+
+# ==========================================================
+# CLUSTER CARD
 # ==========================================================
 
-def hero_card(title, subtitle):
+def cluster_card(cluster, nama_cluster, jumlah_data):
+    """
+    Card untuk menampilkan hasil cluster.
+    """
 
     st.markdown(
         f"""
-        <div style="
-            background:linear-gradient(90deg,#EE4D2D,#FF7A59);
-            padding:30px;
-            border-radius:18px;
-            color:white;
-            margin-bottom:20px;
-            box-shadow:0 8px 20px rgba(0,0,0,.08);
-        ">
+        <div class="cluster-card">
 
-            <h2 style="
-                margin:0;
-                color:white;
-            ">
-                {title}
-            </h2>
+            <div class="cluster-header">
 
-            <p style="
-                margin-top:10px;
-                color:white;
-                font-size:16px;
-            ">
-                {subtitle}
-            </p>
+                📌 {cluster}
+
+            </div>
+
+            <div class="cluster-name">
+
+                {nama_cluster}
+
+            </div>
+
+            <div class="cluster-total">
+
+                {jumlah_data} Transaksi
+
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+# ==========================================================
+# RECOMMENDATION CARD
+# ==========================================================
+
+def recommendation_card(title, recommendations):
+    """
+    Card rekomendasi operasional.
+    """
+
+    items = ""
+
+    for item in recommendations:
+
+        items += f"<li>{item}</li>"
+
+    st.markdown(
+        f"""
+        <div class="recommendation-card">
+
+            <h4>{title}</h4>
+
+            <ul>
+
+                {items}
+
+            </ul>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+# ==========================================================
+# SUCCESS CARD
+# ==========================================================
+
+def success_card(message):
+    """
+    Card keberhasilan proses.
+    """
+
+    st.markdown(
+        f"""
+        <div class="success-card">
+
+            ✅ {message}
 
         </div>
         """,
