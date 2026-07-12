@@ -4,7 +4,8 @@ import pandas as pd
 
 from utils.components import (
     section_title,
-    info_card
+    info_card,
+    success_card
 )
 
 from utils.report import generate_pdf
@@ -21,7 +22,7 @@ def show_download():
         "Unduh hasil analisis dalam format PDF maupun Excel."
     )
 
-    st.markdown("---")
+    st.divider()
 
     # ======================================================
     # VALIDASI
@@ -35,15 +36,9 @@ def show_download():
 
         return
 
-    if "cluster_statistics" not in st.session_state:
-
-        st.warning(
-            "Statistik cluster belum tersedia."
-        )
-
-        return
-
     hasil = st.session_state["hasil_cluster"]
+
+    summary = st.session_state["summary_cluster"]
 
     statistik = st.session_state["cluster_statistics"]
 
@@ -54,47 +49,45 @@ def show_download():
     info_card(
         "Laporan PDF",
         """
-        File PDF berisi:
+Laporan PDF berisi:
 
-        • Ringkasan Analisis
+• Ringkasan hasil analisis
 
-        • Karakteristik Cluster
+• Hasil pengelompokan transaksi
 
-        • Statistik Cluster
+• Karakteristik setiap cluster
 
-        • Rekomendasi Operasional
+• Rekomendasi operasional
+
+Laporan dibuat sederhana sehingga mudah dipahami oleh pihak toko.
         """
     )
 
-    if st.button(
-        "📄 Buat Laporan PDF",
+    pdf_buffer = generate_pdf(
+
+        hasil,
+
+        summary,
+
+        statistik
+
+    )
+
+    st.download_button(
+
+        label="📄 Download Laporan PDF",
+
+        data=pdf_buffer,
+
+        file_name="Laporan_Analisis_Transaksi_Shopee_Food.pdf",
+
+        mime="application/pdf",
+
         use_container_width=True
-    ):
 
-        pdf_path = generate_pdf(
-            statistik
-        )
+    )
 
-        with open(
-            pdf_path,
-            "rb"
-        ) as f:
-
-            st.download_button(
-
-                label="⬇ Download Laporan PDF",
-
-                data=f,
-
-                file_name="Laporan_Hasil_Analisis.pdf",
-
-                mime="application/pdf",
-
-                use_container_width=True
-
-            )
-
-    st.markdown("---")
+    st.divider()
 
     # ======================================================
     # EXCEL
@@ -103,9 +96,8 @@ def show_download():
     info_card(
         "Dataset Excel",
         """
-        File Excel berisi seluruh data transaksi
-        beserta hasil cluster sehingga dapat
-        digunakan untuk analisis lanjutan.
+File Excel berisi seluruh data transaksi beserta hasil clustering
+dan statistik setiap cluster.
         """
     )
 
@@ -117,9 +109,23 @@ def show_download():
     ) as writer:
 
         hasil.to_excel(
+
             writer,
+
             index=False,
+
             sheet_name="Hasil Clustering"
+
+        )
+
+        statistik.to_excel(
+
+            writer,
+
+            index=False,
+
+            sheet_name="Statistik Cluster"
+
         )
 
     excel_buffer.seek(0)
@@ -136,4 +142,10 @@ def show_download():
 
         use_container_width=True
 
+    )
+
+    st.divider()
+
+    success_card(
+        "Laporan analisis siap diunduh."
     )
