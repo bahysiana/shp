@@ -6,14 +6,22 @@ from utils.clustering import (
     add_cluster_result,
     add_cluster_label,
     cluster_summary,
-    cluster_statistics
+    cluster_statistics,
+    get_cluster_information
+)
+
+from utils.interpretation import (
+    get_cluster_interpretation
 )
 
 from utils.components import (
     section_title,
     metric_card,
     cluster_card,
-    success_card
+    success_card,
+    info_card,
+    analysis_card,
+    recommendation_card
 )
 
 
@@ -29,10 +37,15 @@ def show_clustering():
 
     section_title(
         "📊 Clustering",
-        "Melakukan pengelompokan transaksi Shopee Food berdasarkan karakteristik transaksi untuk membantu menentukan prioritas pelayanan."
+        "Melakukan pengelompokan transaksi Shopee Food untuk membantu menentukan prioritas pelayanan pada Toko Buffet The Padang Pasir."
     )
 
-    st.markdown("---")
+    info_card(
+        "Informasi",
+        "Tekan tombol 'Mulai Clustering' untuk mengelompokkan transaksi berdasarkan karakteristik beban pelayanan."
+    )
+
+    st.divider()
 
     # ======================================================
     # VALIDASI
@@ -50,7 +63,7 @@ def show_clustering():
     original_df = st.session_state["original_df"]
 
     # ======================================================
-    # BUTTON
+    # BUTTON PROSES
     # ======================================================
 
     if st.button(
@@ -73,7 +86,8 @@ def show_clustering():
             )
 
             hasil = add_cluster_label(
-                hasil
+                hasil,
+                centroid
             )
 
             summary = cluster_summary(
@@ -89,6 +103,10 @@ def show_clustering():
             st.session_state["cluster_statistics"] = statistik
             st.session_state["centroid"] = centroid
 
+        st.success(
+            "Proses clustering berhasil dilakukan."
+        )
+
         st.rerun()
 
     # ======================================================
@@ -98,7 +116,7 @@ def show_clustering():
     if "hasil_cluster" not in st.session_state:
 
         st.info(
-            "Klik tombol **Mulai Clustering** untuk melakukan analisis transaksi."
+            "Belum ada hasil clustering."
         )
 
         return
@@ -109,11 +127,17 @@ def show_clustering():
 
     statistik = st.session_state["cluster_statistics"]
 
-    success_card(
-        "Proses clustering berhasil dilakukan."
+    info_cluster = get_cluster_information(
+        summary
     )
 
-    st.markdown("---")
+    interpretasi = get_cluster_interpretation()
+
+    success_card(
+        "Analisis transaksi berhasil dilakukan."
+    )
+
+    st.divider()
 
     # ======================================================
     # RINGKASAN
@@ -141,7 +165,7 @@ def show_clustering():
             "📊"
         )
 
-    st.markdown("---")
+    st.divider()
 
     # ======================================================
     # DISTRIBUSI CLUSTER
@@ -149,7 +173,7 @@ def show_clustering():
 
     section_title(
         "📈 Distribusi Cluster",
-        "Perbandingan jumlah transaksi pada setiap cluster."
+        "Perbandingan jumlah transaksi pada masing-masing cluster."
     )
 
     fig = px.pie(
@@ -179,13 +203,13 @@ def show_clustering():
 
     fig.update_layout(
 
-        showlegend=True,
+        legend_title="Cluster",
 
         margin=dict(
             l=10,
             r=10,
-            t=20,
-            b=20
+            t=10,
+            b=10
         )
 
     )
@@ -195,96 +219,94 @@ def show_clustering():
         use_container_width=True
     )
 
-    st.markdown("---")
+    st.divider()
 
     # ======================================================
     # HASIL CLUSTER
     # ======================================================
 
     section_title(
-        "📌 Hasil Clustering",
-        "Ringkasan jumlah transaksi pada setiap cluster."
+        "📌 Ringkasan Hasil Clustering",
+        "Hasil pengelompokan transaksi berdasarkan karakteristik beban pelayanan."
     )
 
     col1, col2 = st.columns(2)
 
-    cluster0 = summary[
-        summary["Cluster"] == 0
-    ]
-
-    cluster1 = summary[
-        summary["Cluster"] == 1
-    ]
-
     with col1:
 
-        if not cluster0.empty:
+        cluster_card(
 
-            cluster_card(
+            info_cluster["tinggi"]["cluster"],
 
-                "Cluster 0",
+            "Pola Transaksi dengan Beban Pelayanan Tinggi",
 
-                cluster0.iloc[0]["Nama Cluster"],
+            info_cluster["tinggi"]["jumlah"]
 
-                cluster0.iloc[0]["Jumlah Data"]
-
-            )
+        )
 
     with col2:
 
-        if not cluster1.empty:
+        cluster_card(
 
-            cluster_card(
+            info_cluster["rendah"]["cluster"],
 
-                "Cluster 1",
+            "Pola Transaksi dengan Beban Pelayanan Rendah",
 
-                cluster1.iloc[0]["Nama Cluster"],
+            info_cluster["rendah"]["jumlah"]
 
-                cluster1.iloc[0]["Jumlah Data"]
+        )
 
-            )
-
-    st.markdown("---")
+    st.divider()
         # ======================================================
-    # APA ARTI CLUSTER INI?
+    # PENJELASAN HASIL CLUSTERING
     # ======================================================
 
     section_title(
-        "💡 Apa Arti Cluster Ini?",
-        "Penjelasan sederhana mengenai karakteristik masing-masing cluster."
+        "💡 Penjelasan Hasil Clustering",
+        "Penjelasan sederhana mengenai karakteristik setiap cluster."
     )
 
-    st.markdown("""
+    col1, col2 = st.columns(2)
 
-### 📌 Cluster 0 - Pola Transaksi dengan Beban Pelayanan Tinggi
+    with col1:
 
-Cluster ini menunjukkan transaksi yang memiliki jumlah pesanan lebih banyak,
-variasi menu yang lebih beragam, nilai transaksi yang lebih tinggi, serta
-membutuhkan waktu persiapan yang lebih lama dibandingkan cluster lainnya.
+        analysis_card(
 
-Transaksi pada kelompok ini sebaiknya menjadi prioritas dalam proses
-pelayanan agar pesanan dapat diselesaikan tepat waktu dan kualitas pelayanan
-kepada pelanggan tetap terjaga.
+            f"📌 {info_cluster['tinggi']['cluster']}",
 
-""")
+            interpretasi["tinggi"]["description"]
 
-    st.markdown("---")
+        )
 
-    st.markdown("""
+    with col2:
 
-### 📌 Cluster 1 - Pola Transaksi dengan Beban Pelayanan Rendah
+        analysis_card(
 
-Cluster ini menunjukkan transaksi yang memiliki jumlah pesanan lebih sedikit,
-variasi menu yang lebih sederhana, nilai transaksi yang relatif lebih rendah,
-serta waktu persiapan yang lebih singkat.
+            f"📌 {info_cluster['rendah']['cluster']}",
 
-Kelompok transaksi ini dapat ditangani dengan alur pelayanan normal sehingga
-tenaga kerja dapat lebih difokuskan pada transaksi dengan tingkat kompleksitas
-yang lebih tinggi.
+            interpretasi["rendah"]["description"]
 
-""")
+        )
 
-    st.markdown("---")
+    st.divider()
+
+    # ======================================================
+    # KESIMPULAN
+    # ======================================================
+
+    section_title(
+        "📋 Kesimpulan Hasil Clustering"
+    )
+
+    info_card(
+
+        "Kesimpulan",
+
+        interpretasi["kesimpulan"]
+
+    )
+
+    st.divider()
 
     # ======================================================
     # REKOMENDASI
@@ -299,34 +321,48 @@ yang lebih tinggi.
 
         "Rekomendasi Operasional",
 
-        [
-
-            "Prioritaskan penanganan transaksi yang termasuk Cluster 0 agar pesanan dengan tingkat kompleksitas tinggi dapat diselesaikan tepat waktu.",
-
-            "Atur pembagian tugas antar tenaga kerja sehingga proses penyiapan pesanan menjadi lebih efisien.",
-
-            "Gunakan hasil clustering sebagai acuan dalam menentukan prioritas pelayanan ketika jumlah pesanan meningkat.",
-
-            "Lakukan evaluasi terhadap waktu persiapan untuk meningkatkan kualitas pelayanan kepada pelanggan."
-
-        ]
+        interpretasi["rekomendasi"]
 
     )
 
-    st.markdown("---")
+    st.divider()
 
     # ======================================================
-    # STATISTIK CLUSTER
+    # KARAKTERISTIK CLUSTER
     # ======================================================
 
     section_title(
-        "📈 Rata-rata Karakteristik Tiap Cluster",
+        "📈 Karakteristik Tiap Cluster",
         "Nilai rata-rata setiap variabel pada masing-masing cluster."
+    )
+
+    statistik_tampil = statistik.copy()
+
+    statistik_tampil = statistik_tampil.rename(
+
+        columns={
+
+            "Nama Cluster": "Cluster",
+
+            "Total_harga": "Total Harga",
+
+            "Jumlah_pesanan": "Jumlah Pesanan",
+
+            "Jumlah_jenis_menu": "Jumlah Jenis Menu",
+
+            "waktu_persiapan_yang_diberikan":
+                "Estimasi Persiapan (Menit)",
+
+            "waktu_persiapan_digunakan":
+                "Waktu Persiapan (Menit)"
+
+        }
+
     )
 
     st.dataframe(
 
-        statistik,
+        statistik_tampil,
 
         use_container_width=True,
 
@@ -334,53 +370,119 @@ yang lebih tinggi.
 
     )
 
-    st.markdown("---")
-
-    # ======================================================
-    # DATA HASIL CLUSTERING
+    st.divider()
+        # ======================================================
+    # DETAIL DATA TRANSAKSI
     # ======================================================
 
     section_title(
-        "📄 Data Hasil Clustering",
-        "Menampilkan data transaksi beserta hasil pengelompokan."
+        "📄 Detail Data Transaksi",
+        "Menampilkan data transaksi beserta hasil cluster."
     )
 
-    col1, col2 = st.columns([2,1])
+    col1, col2 = st.columns([3, 1])
 
     with col1:
 
         keyword = st.text_input(
-            "🔍 Cari berdasarkan Username atau Menu"
+            "🔍 Cari Username atau Menu",
+            placeholder="Masukkan username atau nama menu..."
         )
 
     with col2:
 
-        jumlah = st.selectbox(
-            "Jumlah Data",
-            [10,25,50,100],
+        jumlah_data = st.selectbox(
+            "Tampilkan",
+            [10, 25, 50, 100],
             index=0
         )
 
     hasil_tampil = hasil.copy()
 
+    # ======================================================
+    # FILTER DATA
+    # ======================================================
+
     if keyword:
 
-        hasil_tampil = hasil_tampil[
-            hasil_tampil.astype(str)
-            .apply(
-                lambda x:
-                x.str.contains(
-                    keyword,
-                    case=False,
-                    na=False
+        keyword = keyword.lower()
+
+        kolom_pencarian = []
+
+        if "username" in hasil_tampil.columns:
+            kolom_pencarian.append("username")
+
+        if "menu_yang_dibeli" in hasil_tampil.columns:
+            kolom_pencarian.append("menu_yang_dibeli")
+
+        if kolom_pencarian:
+
+            mask = False
+
+            for kolom in kolom_pencarian:
+
+                mask = (
+                    mask
+                    |
+                    hasil_tampil[kolom]
+                    .astype(str)
+                    .str.lower()
+                    .str.contains(
+                        keyword,
+                        na=False
+                    )
                 )
-            )
-            .any(axis=1)
-        ]
+
+            hasil_tampil = hasil_tampil[mask]
+
+    # ======================================================
+    # INFORMASI DATA
+    # ======================================================
+
+    st.caption(
+        f"Menampilkan **{min(len(hasil_tampil), jumlah_data)}** dari **{len(hasil_tampil)}** transaksi."
+    )
+
+    # ======================================================
+    # TABEL HASIL
+    # ======================================================
+
+    urutan_kolom = [
+
+        "no",
+
+        "username",
+
+        "menu_yang_dibeli",
+
+        "Total_harga",
+
+        "Jumlah_pesanan",
+
+        "Jumlah_jenis_menu",
+
+        "waktu_persiapan_yang_digunakan",
+
+        "Cluster",
+
+        "Nama Cluster"
+
+    ]
+
+    kolom_tampil = [
+
+        kolom
+
+        for kolom in urutan_kolom
+
+        if kolom in hasil_tampil.columns
+
+    ]
 
     st.dataframe(
 
-        hasil_tampil.head(jumlah),
+        hasil_tampil[kolom_tampil]
+        .head(jumlah_data),
 
         use_container_width=True,
 
@@ -388,8 +490,12 @@ yang lebih tinggi.
 
     )
 
-    st.markdown("---")
+    st.divider()
+
+    # ======================================================
+    # INFORMASI AKHIR
+    # ======================================================
 
     success_card(
-        "Analisis selesai. Hasil clustering siap digunakan dan dapat diunduh pada menu Download."
+        "Proses clustering selesai. Hasil analisis dapat diunduh melalui menu Download."
     )
