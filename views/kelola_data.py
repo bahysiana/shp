@@ -10,11 +10,12 @@ from utils.database import (
 from utils.components import (
     section_title,
     metric_card,
-    info_card
+    info_card,
+    warning_card
 )
 
 # ==========================================================
-# KOLOM WAJIB
+# KOLOM WAJIB DATASET MENTAH
 # ==========================================================
 
 REQUIRED_COLUMNS = [
@@ -30,8 +31,6 @@ REQUIRED_COLUMNS = [
     "harga_per_menu",
 
     "Jumlah_pesanan",
-
-    "Jumlah_jenis_menu",
 
     "waktu_persiapan_yang_diberikan",
 
@@ -64,7 +63,7 @@ def show_kelola_data():
 
     info_card(
 
-        "Informasi",
+        "Informasi Dataset",
 
         """
 Format file yang didukung:
@@ -75,7 +74,12 @@ Format file yang didukung:
 
 • Microsoft Excel 97-2003 (.xls)
 
-Pastikan struktur kolom sesuai dengan dataset penelitian.
+Silakan upload dataset transaksi Shopee Food
+dalam bentuk data mentah.
+
+Proses Data Cleaning, Feature Engineering
+(Jumlah Jenis Menu), dan Min-Max Normalization
+akan dilakukan pada menu Preprocessing.
         """
 
     )
@@ -91,9 +95,13 @@ Pastikan struktur kolom sesuai dengan dataset penelitian.
         "📤 Upload Dataset",
 
         type=[
+
             "csv",
+
             "xlsx",
+
             "xls"
+
         ]
 
     )
@@ -110,32 +118,34 @@ Pastikan struktur kolom sesuai dengan dataset penelitian.
 
                 try:
 
-                    df = pd.read_csv(
-                        uploaded_file
-                    )
+                    df = pd.read_csv(uploaded_file)
 
                 except Exception:
 
                     uploaded_file.seek(0)
 
                     df = pd.read_csv(
+
                         uploaded_file,
+
                         sep=";"
+
                     )
 
             else:
 
-                df = pd.read_excel(
-                    uploaded_file
-                )
+                df = pd.read_excel(uploaded_file)
 
             # ==================================================
-            # RAPIIKAN NAMA KOLOM
+            # MEMBERSIHKAN NAMA KOLOM
             # ==================================================
 
             df.columns = (
+
                 df.columns
+
                 .str.strip()
+
             )
 
             # ==================================================
@@ -155,25 +165,33 @@ Pastikan struktur kolom sesuai dengan dataset penelitian.
             if missing:
 
                 st.error(
-                    "Dataset tidak sesuai dengan format penelitian."
+
+                    "Dataset tidak sesuai dengan format data mentah penelitian."
+
                 )
 
                 st.write(
+
                     "Kolom yang belum tersedia:"
+
                 )
 
                 st.write(
+
                     missing
+
                 )
 
                 return
 
             # ==================================================
-            # PREVIEW
+            # DATASET BERHASIL DIBACA
             # ==================================================
 
             st.success(
-                "✅ Dataset berhasil dibaca."
+
+                "Dataset berhasil dibaca."
+
             )
 
             col1, col2, col3 = st.columns(3)
@@ -227,20 +245,20 @@ Pastikan struktur kolom sesuai dengan dataset penelitian.
             st.divider()
 
             # ==================================================
-            # SEARCH
+            # PENCARIAN DATASET
             # ==================================================
 
             keyword = st.text_input(
-                "🔍 Cari Data"
-            )
 
-            tampil = df.copy()
+                "🔍 Cari Data"
+
+            )
 
             if keyword:
 
-                tampil = tampil[
+                df = df[
 
-                    tampil.astype(str)
+                    df.astype(str)
 
                     .apply(
 
@@ -283,12 +301,14 @@ Pastikan struktur kolom sesuai dengan dataset penelitian.
             )
 
             st.subheader(
-                "📋 Preview Dataset"
+
+                "📋 Preview Dataset Mentah"
+
             )
 
             st.dataframe(
 
-                tampil.head(jumlah),
+                df.head(jumlah),
 
                 use_container_width=True,
 
@@ -297,14 +317,13 @@ Pastikan struktur kolom sesuai dengan dataset penelitian.
             )
 
             st.divider()
-
-            # ==================================================
-            # SIMPAN DATABASE
+                        # ==================================================
+            # SIMPAN DATASET
             # ==================================================
 
             if st.button(
 
-                "💾 Simpan ke Database",
+                "💾 Simpan Dataset",
 
                 use_container_width=True,
 
@@ -312,17 +331,37 @@ Pastikan struktur kolom sesuai dengan dataset penelitian.
 
             ):
 
-                replace_all_data(df)
+                try:
 
-                st.session_state["original_df"] = df.copy()
+                    replace_all_data(df)
 
-                st.success(
+                    st.success(
+                        """
+✅ Dataset mentah berhasil disimpan ke database.
 
-                    "Dataset berhasil disimpan ke database."
+Silakan lanjut ke menu **Preprocessing** untuk melakukan:
 
-                )
+• Data Cleaning
 
-                st.rerun()
+• Feature Engineering (Jumlah Jenis Menu)
+
+• Min-Max Normalization
+
+Setelah proses preprocessing selesai,
+dataset siap digunakan pada proses
+K-Means Clustering.
+                        """
+                    )
+
+                    st.rerun()
+
+                except Exception as e:
+
+                    st.error(
+
+                        f"Gagal menyimpan dataset : {e}"
+
+                    )
 
         except Exception as e:
 
@@ -334,26 +373,31 @@ Pastikan struktur kolom sesuai dengan dataset penelitian.
 
     st.divider()
         # ======================================================
-    # DATA DALAM DATABASE
+    # DATA YANG TERSIMPAN DI DATABASE
     # ======================================================
 
     db = get_all_data()
 
     section_title(
-        "🗃️ Data Dalam Database",
-        "Data transaksi yang telah tersimpan pada database aplikasi."
+
+        "🗃 Dataset Dalam Database",
+
+        "Data mentah yang telah berhasil disimpan."
+
     )
 
     if db.empty:
 
-        info_card(
-            "Database Kosong",
-            """
-Belum ada data yang tersimpan.
+        warning_card(
 
-Silakan upload dataset kemudian klik tombol
-'Simpan ke Database'.
+            "Database Kosong",
+
             """
+Belum ada dataset yang tersimpan.
+
+Silakan upload dataset terlebih dahulu.
+            """
+
         )
 
         return
@@ -367,44 +411,56 @@ Silakan upload dataset kemudian klik tombol
     with col1:
 
         metric_card(
+
             "Jumlah Data",
+
             len(db),
+
             "📦"
+
         )
 
     with col2:
 
         metric_card(
+
             "Jumlah Kolom",
+
             len(db.columns),
+
             "📑"
+
         )
 
     with col3:
 
         metric_card(
+
             "Total Omzet",
+
             f"Rp {db['Total_harga'].fillna(0).sum():,.0f}",
+
             "💰"
+
         )
 
     st.divider()
 
     # ======================================================
-    # PENCARIAN DATA DATABASE
+    # PENCARIAN DATA
     # ======================================================
 
     search_db = st.text_input(
-        "🔎 Cari Data Dalam Database"
-    )
 
-    tampil_db = db.copy()
+        "🔎 Cari Data Dalam Database"
+
+    )
 
     if search_db:
 
-        tampil_db = tampil_db[
+        db = db[
 
-            tampil_db.astype(str)
+            db.astype(str)
 
             .apply(
 
@@ -428,7 +484,7 @@ Silakan upload dataset kemudian klik tombol
 
     jumlah_db = st.selectbox(
 
-        "Jumlah Data Database",
+        "Jumlah Baris Database",
 
         [
 
@@ -448,9 +504,15 @@ Silakan upload dataset kemudian klik tombol
 
     )
 
+    st.subheader(
+
+        "📋 Preview Data Database"
+
+    )
+
     st.dataframe(
 
-        tampil_db.head(jumlah_db),
+        db.head(jumlah_db),
 
         use_container_width=True,
 
@@ -461,30 +523,33 @@ Silakan upload dataset kemudian klik tombol
     st.divider()
 
     # ======================================================
-    # HAPUS DATABASE
+    # HAPUS DATA
     # ======================================================
 
-    info_card(
+    warning_card(
 
-        "Peringatan",
+        "Perhatian",
 
         """
-Menghapus data akan mengosongkan seluruh isi database.
+Menghapus data akan menghapus seluruh dataset
+yang tersimpan di database.
 
-Pastikan data telah dibackup apabila masih diperlukan.
+Proses ini tidak dapat dibatalkan.
         """
 
     )
 
     konfirmasi = st.checkbox(
-        "Saya yakin ingin menghapus seluruh data."
+
+        "Saya yakin ingin menghapus seluruh dataset."
+
     )
 
     if konfirmasi:
 
         if st.button(
 
-            "🗑️ Hapus Seluruh Data",
+            "🗑 Hapus Seluruh Dataset",
 
             use_container_width=True,
 
@@ -492,31 +557,23 @@ Pastikan data telah dibackup apabila masih diperlukan.
 
         ):
 
-            delete_all_data()
+            try:
 
-            # Bersihkan session yang berkaitan
-            for key in [
+                delete_all_data()
 
-                "original_df",
+                st.success(
 
-                "scaled_df",
+                    "Seluruh dataset berhasil dihapus."
 
-                "hasil_cluster",
+                )
 
-                "summary_cluster",
+                st.rerun()
 
-                "cluster_statistics",
+            except Exception as e:
 
-                "centroid"
+                st.error(
 
-            ]:
+                    f"Gagal menghapus dataset : {e}"
 
-                if key in st.session_state:
-
-                    del st.session_state[key]
-
-            st.success(
-                "Seluruh data berhasil dihapus."
-            )
-
-            st.rerun()
+                )
+            
