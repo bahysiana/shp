@@ -26,6 +26,7 @@ from utils.clustering import get_cluster_information
 # ==========================================================
 
 try:
+
     pdfmetrics.registerFont(
         TTFont(
             "Arial",
@@ -147,13 +148,9 @@ def create_table(data):
 # ==========================================================
 
 def generate_pdf(
-
     hasil,
-
     summary,
-
     statistik
-
 ):
 
     buffer = io.BytesIO()
@@ -245,43 +242,28 @@ def generate_pdf(
     ringkasan = [
 
         [
-
             "Informasi",
-
             "Hasil"
-
         ],
 
         [
-
             "Jumlah Transaksi",
-
             str(len(hasil))
-
         ],
 
         [
-
             "Jumlah Cluster",
-
             "2"
-
         ],
 
         [
-
             "Cluster Beban Pelayanan Tinggi",
-
             f"{info['tinggi']['jumlah']} Transaksi"
-
         ],
 
         [
-
             "Cluster Beban Pelayanan Rendah",
-
             f"{info['rendah']['jumlah']} Transaksi"
-
         ]
 
     ]
@@ -310,6 +292,10 @@ def generate_pdf(
 
     )
 
+    # ---------------------------------------------
+    # Format tabel agar angka lebih rapi
+    # ---------------------------------------------
+
     table_data = [
 
         statistik.columns.tolist()
@@ -318,7 +304,25 @@ def generate_pdf(
 
     for row in statistik.values.tolist():
 
-        table_data.append(row)
+        formatted_row = []
+
+        for value in row:
+
+            if isinstance(value, float):
+
+                formatted_row.append(
+                    f"{value:.2f}"
+                )
+
+            else:
+
+                formatted_row.append(
+                    str(value)
+                )
+
+        table_data.append(
+            formatted_row
+        )
 
     elements.append(
 
