@@ -1,15 +1,6 @@
 import pandas as pd
 from sklearn.cluster import KMeans
 
-# =====================================================
-# NAMA CLUSTER
-# =====================================================
-
-CLUSTER_LABELS = {
-    0: "Pola Transaksi dengan Beban Pelayanan Tinggi",
-    1: "Pola Transaksi dengan Beban Pelayanan Rendah"
-}
-
 
 # =====================================================
 # JALANKAN K-MEANS
@@ -47,14 +38,33 @@ def add_cluster_result(df, labels):
 
 
 # =====================================================
-# TAMBAHKAN LABEL CLUSTER
+# MENENTUKAN NAMA CLUSTER OTOMATIS
 # =====================================================
 
-def add_cluster_label(df):
+def add_cluster_label(df, centroid):
 
     hasil = df.copy()
 
-    hasil["Nama Cluster"] = hasil["Cluster"].map(CLUSTER_LABELS)
+    # Hitung total nilai centroid setiap cluster
+    centroid_score = centroid.sum(axis=1)
+
+    # Cluster dengan nilai centroid terbesar
+    cluster_tinggi = centroid_score.idxmax()
+
+    # Cluster dengan nilai centroid terkecil
+    cluster_rendah = centroid_score.idxmin()
+
+    mapping = {
+
+        cluster_tinggi:
+        "Pola Transaksi dengan Beban Pelayanan Tinggi",
+
+        cluster_rendah:
+        "Pola Transaksi dengan Beban Pelayanan Rendah"
+
+    }
+
+    hasil["Nama Cluster"] = hasil["Cluster"].map(mapping)
 
     return hasil
 
@@ -66,15 +76,29 @@ def add_cluster_label(df):
 def cluster_summary(df):
 
     summary = (
-        df.groupby(["Cluster", "Nama Cluster"])
+
+        df.groupby(
+
+            ["Cluster", "Nama Cluster"]
+
+        )
+
         .size()
+
         .reset_index(name="Jumlah Data")
+
     )
 
     total = summary["Jumlah Data"].sum()
 
     summary["Persentase (%)"] = (
-        summary["Jumlah Data"] / total * 100
+
+        summary["Jumlah Data"]
+
+        / total
+
+        * 100
+
     ).round(2)
 
     return summary
@@ -87,18 +111,35 @@ def cluster_summary(df):
 def cluster_statistics(df):
 
     statistik = (
-        df.groupby(["Cluster", "Nama Cluster"])[
+
+        df.groupby(
+
+            ["Cluster", "Nama Cluster"]
+
+        )[
+
             [
+
                 "Total_harga",
+
                 "Jumlah_pesanan",
+
                 "Jumlah_jenis_menu",
+
                 "waktu_persiapan_yang_diberikan",
+
                 "waktu_persiapan_digunakan"
+
             ]
+
         ]
+
         .mean()
+
         .round(2)
+
         .reset_index()
+
     )
 
     return statistik
