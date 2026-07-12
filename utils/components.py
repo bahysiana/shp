@@ -1,38 +1,16 @@
 import streamlit as st
 
+
 # ==========================================================
 # SECTION TITLE
 # ==========================================================
 
 def section_title(title, subtitle=None):
-    """
-    Menampilkan judul section.
-    """
 
-    st.markdown(
-        f"""
-        <div style="margin-top:10px;margin-bottom:20px;">
+    st.subheader(title)
 
-            <h2 style="
-                color:#1F2937;
-                margin-bottom:5px;
-                font-weight:700;
-                letter-spacing:.2px;
-            ">
-
-                {title}
-
-            </h2>
-
-            {
-                f'<p style="color:#6B7280;font-size:15px;">{subtitle}</p>'
-                if subtitle else ""
-            }
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    if subtitle:
+        st.caption(subtitle)
 
 
 # ==========================================================
@@ -40,21 +18,13 @@ def section_title(title, subtitle=None):
 # ==========================================================
 
 def hero_card(title, subtitle):
-    """
-    Banner utama halaman Home.
-    """
 
-    st.markdown(
+    st.info(
         f"""
-        <div class="hero-card">
+### 🍽️ {title}
 
-            <h2>{title}</h2>
-
-            <p>{subtitle}</p>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+{subtitle}
+"""
     )
 
 
@@ -63,35 +33,10 @@ def hero_card(title, subtitle):
 # ==========================================================
 
 def metric_card(title, value, icon="📊"):
-    """
-    Card informasi singkat.
-    """
 
-    st.markdown(
-        f"""
-        <div class="metric-card">
-
-            <div class="metric-icon">
-
-                {icon}
-
-            </div>
-
-            <div class="metric-value">
-
-                {value}
-
-            </div>
-
-            <div class="metric-title">
-
-                {title}
-
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+    st.metric(
+        label=f"{icon} {title}",
+        value=value
     )
 
 
@@ -100,22 +45,12 @@ def metric_card(title, value, icon="📊"):
 # ==========================================================
 
 def info_card(title, content):
-    """
-    Card informasi.
-    """
 
-    st.markdown(
-        f"""
-        <div class="info-card">
+    with st.container(border=True):
 
-            <h4>{title}</h4>
+        st.markdown(f"#### {title}")
 
-            <p>{content}</p>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+        st.write(content)
 
 
 # ==========================================================
@@ -128,50 +63,24 @@ def cluster_card(
     jumlah_data,
     persentase=None
 ):
-    """
-    Card hasil cluster.
-    """
 
-    persen_html = ""
+    with st.container(border=True):
 
-    if persentase is not None:
+        st.markdown(f"### 📌 {cluster}")
 
-        persen_html = f"""
-        <div class="cluster-percent">
+        st.write(nama_cluster)
 
-            {persentase:.2f}%
+        st.metric(
+            "Jumlah Transaksi",
+            jumlah_data
+        )
 
-        </div>
-        """
+        if persentase is not None:
 
-    st.markdown(
-        f"""
-        <div class="cluster-card">
-
-            <div class="cluster-header">
-
-                📌 {cluster}
-
-            </div>
-
-            <div class="cluster-name">
-
-                {nama_cluster}
-
-            </div>
-
-            <div class="cluster-total">
-
-                {jumlah_data}
-
-            </div>
-
-            {persen_html}
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+            st.metric(
+                "Persentase",
+                f"{persentase:.2f}%"
+            )
 
 
 # ==========================================================
@@ -183,30 +92,12 @@ def analysis_card(
     content,
     icon="💡"
 ):
-    """
-    Card penjelasan hasil analisis.
-    """
 
-    st.markdown(
-        f"""
-        <div class="analysis-card">
+    with st.container(border=True):
 
-            <h4>
+        st.markdown(f"### {icon} {title}")
 
-                {icon} {title}
-
-            </h4>
-
-            <p>
-
-                {content}
-
-            </p>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+        st.write(content)
 
 
 # ==========================================================
@@ -217,32 +108,14 @@ def recommendation_card(
     title,
     recommendations
 ):
-    """
-    Card rekomendasi operasional.
-    """
 
-    items = ""
+    with st.container(border=True):
 
-    for item in recommendations:
+        st.markdown(f"### ✅ {title}")
 
-        items += f"<li>{item}</li>"
+        for item in recommendations:
 
-    st.markdown(
-        f"""
-        <div class="recommendation-card">
-
-            <h4>{title}</h4>
-
-            <ul>
-
-                {items}
-
-            </ul>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+            st.write(f"• {item}")
 
 
 # ==========================================================
@@ -250,20 +123,8 @@ def recommendation_card(
 # ==========================================================
 
 def success_card(message):
-    """
-    Card notifikasi berhasil.
-    """
 
-    st.markdown(
-        f"""
-        <div class="success-card">
-
-            ✅ {message}
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.success(message)
 
 
 # ==========================================================
@@ -271,22 +132,8 @@ def success_card(message):
 # ==========================================================
 
 def warning_card(title, content):
-    """
-    Card peringatan.
-    """
 
-    st.markdown(
-        f"""
-        <div class="warning-card">
-
-            <h4>⚠️ {title}</h4>
-
-            <p>{content}</p>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.warning(f"**{title}**\n\n{content}")
 
 
 # ==========================================================
@@ -294,19 +141,5 @@ def warning_card(title, content):
 # ==========================================================
 
 def empty_card(title, content):
-    """
-    Card ketika data belum tersedia.
-    """
 
-    st.markdown(
-        f"""
-        <div class="empty-card">
-
-            <h4>📂 {title}</h4>
-
-            <p>{content}</p>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.info(f"**{title}**\n\n{content}")
