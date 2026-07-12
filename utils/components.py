@@ -24,6 +24,7 @@ def section_title(title, subtitle=None):
                 f'<p style="color:#6B7280;font-size:15px;">{subtitle}</p>'
                 if subtitle else ""
             }
+
         </div>
         """,
         unsafe_allow_html=True
@@ -59,7 +60,7 @@ def hero_card(title, subtitle):
 
 def metric_card(title, value, icon="📊"):
     """
-    Card untuk menampilkan informasi singkat.
+    Card informasi singkat.
     """
 
     st.markdown(
@@ -111,10 +112,25 @@ def info_card(title, content):
 # CLUSTER CARD
 # ==========================================================
 
-def cluster_card(cluster, nama_cluster, jumlah_data):
+def cluster_card(
+    cluster,
+    nama_cluster,
+    jumlah_data,
+    persentase=None
+):
     """
-    Card untuk menampilkan hasil cluster.
+    Card hasil cluster.
     """
+
+    persen_html = ""
+
+    if persentase is not None:
+
+        persen_html = f"""
+        <div class="cluster-percent">
+            {persentase:.2f}%
+        </div>
+        """
 
     st.markdown(
         f"""
@@ -138,6 +154,43 @@ def cluster_card(cluster, nama_cluster, jumlah_data):
 
             </div>
 
+            {persen_html}
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+# ==========================================================
+# ANALYSIS CARD
+# ==========================================================
+
+def analysis_card(
+    title,
+    content,
+    icon="💡"
+):
+    """
+    Card penjelasan hasil analisis.
+    """
+
+    st.markdown(
+        f"""
+        <div class="analysis-card">
+
+            <h4>
+
+                {icon} {title}
+
+            </h4>
+
+            <p>
+
+                {content}
+
+            </p>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -148,7 +201,10 @@ def cluster_card(cluster, nama_cluster, jumlah_data):
 # RECOMMENDATION CARD
 # ==========================================================
 
-def recommendation_card(title, recommendations):
+def recommendation_card(
+    title,
+    recommendations
+):
     """
     Card rekomendasi operasional.
     """
@@ -183,7 +239,7 @@ def recommendation_card(title, recommendations):
 
 def success_card(message):
     """
-    Card keberhasilan proses.
+    Card notifikasi berhasil.
     """
 
     st.markdown(
@@ -191,27 +247,6 @@ def success_card(message):
         <div class="success-card">
 
             ✅ {message}
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    # ==========================================================
-# ANALYSIS CARD
-# ==========================================================
-
-def analysis_card(title, content):
-    """
-    Card penjelasan hasil analisis cluster.
-    """
-
-    st.markdown(
-        f"""
-        <div class="analysis-card">
-
-            <h4>{title}</h4>
-
-            <p>{content}</p>
 
         </div>
         """,
