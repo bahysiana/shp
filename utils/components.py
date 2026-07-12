@@ -11,13 +11,17 @@ def section_title(title, subtitle=None):
 
     st.markdown(
         f"""
-        <div style="margin-top:10px; margin-bottom:20px;">
+        <div style="margin-top:10px;margin-bottom:20px;">
+
             <h2 style="
                 color:#1F2937;
                 margin-bottom:5px;
                 font-weight:700;
+                letter-spacing:.2px;
             ">
+
                 {title}
+
             </h2>
 
             {
@@ -37,7 +41,7 @@ def section_title(title, subtitle=None):
 
 def hero_card(title, subtitle):
     """
-    Banner utama pada halaman Home.
+    Banner utama halaman Home.
     """
 
     st.markdown(
@@ -68,15 +72,21 @@ def metric_card(title, value, icon="📊"):
         <div class="metric-card">
 
             <div class="metric-icon">
+
                 {icon}
+
             </div>
 
             <div class="metric-value">
+
                 {value}
+
             </div>
 
             <div class="metric-title">
+
                 {title}
+
             </div>
 
         </div>
@@ -128,7 +138,9 @@ def cluster_card(
 
         persen_html = f"""
         <div class="cluster-percent">
+
             {persentase:.2f}%
+
         </div>
         """
 
@@ -150,7 +162,7 @@ def cluster_card(
 
             <div class="cluster-total">
 
-                {jumlah_data} Transaksi
+                {jumlah_data}
 
             </div>
 
@@ -247,6 +259,52 @@ def success_card(message):
         <div class="success-card">
 
             ✅ {message}
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+# ==========================================================
+# WARNING CARD
+# ==========================================================
+
+def warning_card(title, content):
+    """
+    Card peringatan.
+    """
+
+    st.markdown(
+        f"""
+        <div class="warning-card">
+
+            <h4>⚠️ {title}</h4>
+
+            <p>{content}</p>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+# ==========================================================
+# EMPTY CARD
+# ==========================================================
+
+def empty_card(title, content):
+    """
+    Card ketika data belum tersedia.
+    """
+
+    st.markdown(
+        f"""
+        <div class="empty-card">
+
+            <h4>📂 {title}</h4>
+
+            <p>{content}</p>
 
         </div>
         """,
