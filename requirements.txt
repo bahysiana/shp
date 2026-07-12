@@ -1,8 +1,8 @@
-streamlit
-streamlit-option-menu
-pandas
-numpy
-scikit-learn
-plotly
-openpyxl
-reportlab
+streamlit==1.45.1
+streamlit-option-menu==0.4.0
+pandas==2.2.3
+numpy==2.2.6
+scikit-learn==1.6.1
+plotly==6.1.2
+openpyxl==3.1.5
+reportlab==4.4.1
