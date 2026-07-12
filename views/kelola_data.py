@@ -15,7 +15,7 @@ from utils.components import (
 )
 
 # ==========================================================
-# KOLOM WAJIB DATASET MENTAH
+# KOLOM DATASET MENTAH
 # ==========================================================
 
 REQUIRED_COLUMNS = [
@@ -66,7 +66,7 @@ def show_kelola_data():
         "Informasi Dataset",
 
         """
-Format file yang didukung:
+Format file yang didukung :
 
 • CSV (.csv)
 
@@ -77,9 +77,9 @@ Format file yang didukung:
 Silakan upload dataset transaksi Shopee Food
 dalam bentuk data mentah.
 
-Proses Data Cleaning, Feature Engineering
-(Jumlah Jenis Menu), dan Min-Max Normalization
-akan dilakukan pada menu Preprocessing.
+Tahap Data Cleaning, Feature Engineering,
+dan Min-Max Normalization dilakukan
+pada menu Preprocessing.
         """
 
     )
@@ -87,7 +87,7 @@ akan dilakukan pada menu Preprocessing.
     st.divider()
 
     # ======================================================
-    # UPLOAD FILE
+    # UPLOAD DATASET
     # ======================================================
 
     uploaded_file = st.file_uploader(
@@ -106,7 +106,11 @@ akan dilakukan pada menu Preprocessing.
 
     )
 
-    if uploaded_file is not None:
+    if uploaded_file is None:
+
+        st.divider()
+
+    else:
 
         try:
 
@@ -162,17 +166,17 @@ akan dilakukan pada menu Preprocessing.
 
             ]
 
-            if missing:
+            if len(missing) > 0:
 
                 st.error(
 
-                    "Dataset tidak sesuai dengan format data mentah penelitian."
+                    "Dataset tidak sesuai dengan format penelitian."
 
                 )
 
                 st.write(
 
-                    "Kolom yang belum tersedia:"
+                    "Kolom yang belum tersedia :"
 
                 )
 
@@ -183,14 +187,41 @@ akan dilakukan pada menu Preprocessing.
                 )
 
                 return
+                            # ==================================================
+            # MEMBERSIHKAN KOLOM TOTAL HARGA
+            # ==================================================
+
+            df["Total_harga"] = (
+
+                df["Total_harga"]
+
+                .astype(str)
+
+                .str.replace("Rp", "", regex=False)
+
+                .str.replace(".", "", regex=False)
+
+                .str.replace(",", "", regex=False)
+
+                .str.strip()
+
+            )
+
+            df["Total_harga"] = pd.to_numeric(
+
+                df["Total_harga"],
+
+                errors="coerce"
+
+            ).fillna(0)
 
             # ==================================================
-            # DATASET BERHASIL DIBACA
+            # INFORMASI DATASET
             # ==================================================
 
             st.success(
 
-                "Dataset berhasil dibaca."
+                "✅ Dataset berhasil dibaca."
 
             )
 
@@ -222,21 +253,11 @@ akan dilakukan pada menu Preprocessing.
 
             with col3:
 
-                total = (
-
-                    df["Total_harga"]
-
-                    .fillna(0)
-
-                    .sum()
-
-                )
-
                 metric_card(
 
                     "Total Omzet",
 
-                    f"Rp {total:,.0f}",
+                    f"Rp {df['Total_harga'].sum():,.0f}",
 
                     "💰"
 
@@ -254,11 +275,13 @@ akan dilakukan pada menu Preprocessing.
 
             )
 
+            preview_df = df.copy()
+
             if keyword:
 
-                df = df[
+                preview_df = preview_df[
 
-                    df.astype(str)
+                    preview_df.astype(str)
 
                     .apply(
 
@@ -308,7 +331,7 @@ akan dilakukan pada menu Preprocessing.
 
             st.dataframe(
 
-                df.head(jumlah),
+                preview_df.head(jumlah),
 
                 use_container_width=True,
 
@@ -317,7 +340,8 @@ akan dilakukan pada menu Preprocessing.
             )
 
             st.divider()
-                        # ==================================================
+
+            # ==================================================
             # SIMPAN DATASET
             # ==================================================
 
@@ -325,45 +349,33 @@ akan dilakukan pada menu Preprocessing.
 
                 "💾 Simpan Dataset",
 
-                use_container_width=True,
+                type="primary",
 
-                type="primary"
+                use_container_width=True
 
             ):
 
-                try:
+                replace_all_data(df)
 
-                    replace_all_data(df)
+                st.success(
 
-                    st.success(
-                        """
-✅ Dataset mentah berhasil disimpan ke database.
+                    """
+Dataset mentah berhasil disimpan.
 
-Silakan lanjut ke menu **Preprocessing** untuk melakukan:
+Silakan lanjut ke menu **Preprocessing**
+untuk melakukan:
 
 • Data Cleaning
 
-• Feature Engineering (Jumlah Jenis Menu)
+• Feature Engineering
 
 • Min-Max Normalization
+                    """
 
-Setelah proses preprocessing selesai,
-dataset siap digunakan pada proses
-K-Means Clustering.
-                        """
-                    )
+                )
 
-                    st.rerun()
-
-                except Exception as e:
-
-                    st.error(
-
-                        f"Gagal menyimpan dataset : {e}"
-
-                    )
-
-        except Exception as e:
+                st.rerun()
+                        except Exception as e:
 
             st.error(
 
@@ -372,8 +384,9 @@ K-Means Clustering.
             )
 
     st.divider()
-        # ======================================================
-    # DATA YANG TERSIMPAN DI DATABASE
+
+    # ======================================================
+    # DATA DALAM DATABASE
     # ======================================================
 
     db = get_all_data()
@@ -382,7 +395,7 @@ K-Means Clustering.
 
         "🗃 Dataset Dalam Database",
 
-        "Data mentah yang telah berhasil disimpan."
+        "Dataset mentah yang telah tersimpan."
 
     )
 
@@ -401,6 +414,34 @@ Silakan upload dataset terlebih dahulu.
         )
 
         return
+
+    # ======================================================
+    # MEMBERSIHKAN TOTAL HARGA DATABASE
+    # ======================================================
+
+    db["Total_harga"] = (
+
+        db["Total_harga"]
+
+        .astype(str)
+
+        .str.replace("Rp", "", regex=False)
+
+        .str.replace(".", "", regex=False)
+
+        .str.replace(",", "", regex=False)
+
+        .str.strip()
+
+    )
+
+    db["Total_harga"] = pd.to_numeric(
+
+        db["Total_harga"],
+
+        errors="coerce"
+
+    ).fillna(0)
 
     # ======================================================
     # METRIC DATABASE
@@ -438,7 +479,7 @@ Silakan upload dataset terlebih dahulu.
 
             "Total Omzet",
 
-            f"Rp {db['Total_harga'].fillna(0).sum():,.0f}",
+            f"Rp {db['Total_harga'].sum():,.0f}",
 
             "💰"
 
@@ -447,7 +488,7 @@ Silakan upload dataset terlebih dahulu.
     st.divider()
 
     # ======================================================
-    # PENCARIAN DATA
+    # PENCARIAN DATABASE
     # ======================================================
 
     search_db = st.text_input(
@@ -456,11 +497,13 @@ Silakan upload dataset terlebih dahulu.
 
     )
 
+    preview_db = db.copy()
+
     if search_db:
 
-        db = db[
+        preview_db = preview_db[
 
-            db.astype(str)
+            preview_db.astype(str)
 
             .apply(
 
@@ -498,21 +541,19 @@ Silakan upload dataset terlebih dahulu.
 
         ],
 
-        index=0,
-
         key="jumlah_database"
 
     )
 
     st.subheader(
 
-        "📋 Preview Data Database"
+        "📋 Preview Dataset Database"
 
     )
 
     st.dataframe(
 
-        db.head(jumlah_db),
+        preview_db.head(jumlah_db),
 
         use_container_width=True,
 
@@ -531,8 +572,7 @@ Silakan upload dataset terlebih dahulu.
         "Perhatian",
 
         """
-Menghapus data akan menghapus seluruh dataset
-yang tersimpan di database.
+Seluruh dataset yang tersimpan akan dihapus.
 
 Proses ini tidak dapat dibatalkan.
         """
@@ -551,29 +591,17 @@ Proses ini tidak dapat dibatalkan.
 
             "🗑 Hapus Seluruh Dataset",
 
-            use_container_width=True,
-
-            type="secondary"
+            use_container_width=True
 
         ):
 
-            try:
+            delete_all_data()
 
-                delete_all_data()
+            st.success(
 
-                st.success(
+                "Dataset berhasil dihapus."
 
-                    "Seluruh dataset berhasil dihapus."
+            )
 
-                )
-
-                st.rerun()
-
-            except Exception as e:
-
-                st.error(
-
-                    f"Gagal menghapus dataset : {e}"
-
-                )
+            st.rerun()
             
