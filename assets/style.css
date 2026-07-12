@@ -1,25 +1,27 @@
-/* ===========================================================
+/* ==========================================================
    SHOPEE FOOD ANALYTICS
    Buffet The Padang Pasir
-=========================================================== */
+========================================================== */
 
-/* ==========================
+
+/* ==========================================================
    GLOBAL
-========================== */
+========================================================== */
 
 .stApp{
-    background:#F8F9FA;
+    background:#F6F8FB;
 }
 
 .block-container{
-    padding-top:25px;
-    padding-bottom:40px;
     max-width:1300px;
+    padding-top:25px;
+    padding-bottom:35px;
 }
 
-/* ==========================
+
+/* ==========================================================
    SIDEBAR
-========================== */
+========================================================== */
 
 [data-testid="stSidebar"]{
     background:#FFFFFF;
@@ -27,12 +29,13 @@
 }
 
 [data-testid="stSidebarContent"]{
-    padding:25px 18px;
+    padding:22px 18px;
 }
 
-/* ==========================
+
+/* ==========================================================
    OPTION MENU
-========================== */
+========================================================== */
 
 .nav-link{
 
@@ -46,7 +49,7 @@
 
     font-weight:600 !important;
 
-    transition:0.25s;
+    transition:.25s;
 
 }
 
@@ -66,9 +69,10 @@
 
 }
 
-/* ==========================
+
+/* ==========================================================
    TITLE
-========================== */
+========================================================== */
 
 h1{
 
@@ -94,9 +98,51 @@ h3{
 
 }
 
-/* ==========================
+
+/* ==========================================================
+   HERO CARD
+========================================================== */
+
+.hero-card{
+
+    background:linear-gradient(135deg,#EE4D2D,#FF7A59);
+
+    border-radius:20px;
+
+    padding:35px;
+
+    color:white;
+
+    margin-bottom:25px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.10);
+
+}
+
+.hero-card h2{
+
+    color:white;
+
+    margin:0;
+
+}
+
+.hero-card p{
+
+    color:white;
+
+    margin-top:12px;
+
+    line-height:1.8;
+
+    font-size:16px;
+
+}
+
+
+/* ==========================================================
    METRIC CARD
-========================== */
+========================================================== */
 
 .metric-card{
 
@@ -108,7 +154,7 @@ h3{
 
     border:1px solid #ECECEC;
 
-    box-shadow:0 6px 18px rgba(0,0,0,.05);
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
 
     transition:.25s;
 
@@ -120,9 +166,9 @@ h3{
 
 .metric-card:hover{
 
-    transform:translateY(-4px);
+    transform:translateY(-5px);
 
-    box-shadow:0 12px 24px rgba(0,0,0,.08);
+    box-shadow:0 12px 25px rgba(0,0,0,.10);
 
 }
 
@@ -138,9 +184,9 @@ h3{
 
     font-size:30px;
 
-    font-weight:700;
-
     color:#EE4D2D;
+
+    font-weight:700;
 
 }
 
@@ -152,9 +198,83 @@ h3{
 
 }
 
-/* ==========================
+
+/* ==========================================================
+   CLUSTER CARD
+========================================================== */
+
+.cluster-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    border-left:6px solid #EE4D2D;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
+
+    margin-bottom:20px;
+
+    transition:.25s;
+
+}
+
+.cluster-card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 12px 25px rgba(0,0,0,.10);
+
+}
+
+.cluster-header{
+
+    font-size:20px;
+
+    font-weight:700;
+
+    color:#EE4D2D;
+
+    margin-bottom:15px;
+
+}
+
+.cluster-name{
+
+    font-size:17px;
+
+    color:#1F2937;
+
+    font-weight:600;
+
+    line-height:1.7;
+
+    margin-bottom:18px;
+
+}
+
+.cluster-total{
+
+    background:#FFF3F0;
+
+    padding:12px;
+
+    border-radius:10px;
+
+    text-align:center;
+
+    font-weight:700;
+
+    color:#EE4D2D;
+
+}
+
+
+/* ==========================================================
    INFO CARD
-========================== */
+========================================================== */
 
 .info-card{
 
@@ -166,17 +286,17 @@ h3{
 
     border:1px solid #ECECEC;
 
-    box-shadow:0 6px 18px rgba(0,0,0,.05);
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
 
-    margin-bottom:15px;
+    margin-bottom:20px;
 
 }
 
 .info-card h4{
 
-    margin-bottom:10px;
-
     color:#1F2937;
+
+    margin-bottom:12px;
 
 }
 
@@ -188,25 +308,98 @@ h3{
 
 }
 
-/* ==========================
+
+/* ==========================================================
+   RECOMMENDATION CARD
+========================================================== */
+
+.recommendation-card{
+
+    background:#FFFFFF;
+
+    border-left:6px solid #10B981;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
+
+    margin-bottom:20px;
+
+}
+
+.recommendation-card h4{
+
+    color:#10B981;
+
+    margin-bottom:15px;
+
+}
+
+.recommendation-card ul{
+
+    padding-left:20px;
+
+    margin:0;
+
+}
+
+.recommendation-card li{
+
+    margin-bottom:10px;
+
+    color:#4B5563;
+
+    line-height:1.8;
+
+}
+
+
+/* ==========================================================
+   SUCCESS CARD
+========================================================== */
+
+.success-card{
+
+    background:#ECFDF5;
+
+    border-left:6px solid #10B981;
+
+    border-radius:16px;
+
+    padding:18px;
+
+    font-weight:600;
+
+    color:#047857;
+
+    margin-bottom:20px;
+
+}
+
+
+/* ==========================================================
    BUTTON
-========================== */
+========================================================== */
 
 .stButton button{
 
-    background:#EE4D2D;
+    width:100%;
 
-    color:white;
+    height:48px;
 
     border:none;
 
     border-radius:12px;
 
-    height:48px;
+    background:#EE4D2D;
+
+    color:white;
 
     font-weight:600;
 
-    transition:.2s;
+    transition:.25s;
 
 }
 
@@ -218,21 +411,24 @@ h3{
 
 }
 
-/* ==========================
+
+/* ==========================================================
    DOWNLOAD BUTTON
-========================== */
+========================================================== */
 
 .stDownloadButton button{
 
-    background:#EE4D2D;
+    width:100%;
 
-    color:white;
+    height:48px;
 
     border:none;
 
     border-radius:12px;
 
-    height:48px;
+    background:#EE4D2D;
+
+    color:white;
 
     font-weight:600;
 
@@ -244,27 +440,29 @@ h3{
 
 }
 
-/* ==========================
+
+/* ==========================================================
    DATAFRAME
-========================== */
+========================================================== */
 
 [data-testid="stDataFrame"]{
 
-    border-radius:16px;
-
-    border:1px solid #ECECEC;
+    border-radius:18px;
 
     overflow:hidden;
 
+    border:1px solid #ECECEC;
+
 }
 
-/* ==========================
+
+/* ==========================================================
    FILE UPLOADER
-========================== */
+========================================================== */
 
 [data-testid="stFileUploader"]{
 
-    border-radius:14px;
+    border-radius:16px;
 
     border:2px dashed #EE4D2D;
 
@@ -272,9 +470,10 @@ h3{
 
 }
 
-/* ==========================
-   METRIC STREAMLIT
-========================== */
+
+/* ==========================================================
+   STREAMLIT METRIC
+========================================================== */
 
 [data-testid="metric-container"]{
 
@@ -284,13 +483,14 @@ h3{
 
     border:1px solid #ECECEC;
 
-    box-shadow:0 6px 18px rgba(0,0,0,.05);
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
 
 }
 
-/* ==========================
+
+/* ==========================================================
    TABS
-========================== */
+========================================================== */
 
 button[role="tab"]{
 
@@ -300,9 +500,10 @@ button[role="tab"]{
 
 }
 
-/* ==========================
+
+/* ==========================================================
    SCROLLBAR
-========================== */
+========================================================== */
 
 ::-webkit-scrollbar{
 
