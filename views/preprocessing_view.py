@@ -11,35 +11,58 @@ from utils.preprocessing import (
 
 def show_preprocessing():
 
-    st.title("🧹 Preprocessing Data")
+    st.title("⚙️ Preprocessing Data")
 
     st.write(
-        "Tahap preprocessing digunakan untuk membersihkan data "
-        "dan melakukan standardisasi sebelum proses K-Means."
+        """
+        Tahap preprocessing dilakukan untuk membersihkan data dan
+        melakukan normalisasi menggunakan **Min-Max Normalization**
+        sebelum proses K-Means Clustering.
+        """
     )
 
     st.markdown("---")
 
     # =====================================================
-    # AMBIL DATA DARI DATABASE
+    # AMBIL DATA
     # =====================================================
 
     df = get_all_data()
 
     if df.empty:
+
         st.warning(
-            "Belum ada data. Silakan upload dataset terlebih dahulu."
+            "Belum ada dataset. Silakan upload data terlebih dahulu."
         )
+
         return
 
     # =====================================================
-    # PREVIEW DATA ASLI
+    # INFORMASI DATASET
     # =====================================================
 
-    st.subheader("📋 Data Asli")
+    col1, col2 = st.columns(2)
+
+    col1.metric(
+        "Jumlah Data",
+        len(df)
+    )
+
+    col2.metric(
+        "Jumlah Variabel",
+        len(get_feature_columns())
+    )
+
+    st.markdown("---")
+
+    # =====================================================
+    # DATASET AWAL
+    # =====================================================
+
+    st.subheader("📋 Dataset Sebelum Preprocessing")
 
     st.dataframe(
-        df.head(10),
+        df,
         use_container_width=True,
         hide_index=True
     )
@@ -47,53 +70,52 @@ def show_preprocessing():
     st.markdown("---")
 
     # =====================================================
-    # JALANKAN PREPROCESSING
+    # TOMBOL PREPROCESSING
     # =====================================================
 
     if st.button(
-        "🚀 Jalankan Preprocessing",
+        "🚀 Proses Preprocessing",
         use_container_width=True
     ):
 
         try:
 
-            # Membersihkan data
             cleaned_df = clean_dataframe(df)
 
-            # Simpan SEMUA kolom hasil cleaning
-            st.session_state["original_df"] = cleaned_df.copy()
+            scaled_df, scaler = preprocess_data(
+                cleaned_df
+            )
 
-            # Standardisasi hanya 4 fitur
-            scaled_df, scaler = preprocess_data(cleaned_df)
-
+            st.session_state["original_df"] = cleaned_df
             st.session_state["scaled_df"] = scaled_df
             st.session_state["scaler"] = scaler
 
             st.success(
-                "✅ Preprocessing berhasil dilakukan."
+                "✅ Preprocessing berhasil dilakukan menggunakan Min-Max Normalization."
             )
 
         except Exception as e:
 
             st.error(
-                f"Terjadi kesalahan: {e}"
+                f"Terjadi kesalahan : {e}"
             )
 
             return
 
     # =====================================================
-    # TAMPILKAN HASIL
+    # HASIL
     # =====================================================
 
     if "scaled_df" not in st.session_state:
+
         return
 
     st.markdown("---")
 
-    st.subheader("📊 Fitur yang Digunakan")
+    st.subheader("📌 Variabel Penelitian")
 
     fitur_df = pd.DataFrame({
-        "Fitur Clustering": get_feature_columns()
+        "Variabel Penelitian": get_feature_columns()
     })
 
     st.dataframe(
@@ -104,7 +126,7 @@ def show_preprocessing():
 
     st.markdown("---")
 
-    st.subheader("📈 Data Setelah Standardisasi")
+    st.subheader("📊 Dataset Setelah Min-Max Normalization")
 
     st.dataframe(
         st.session_state["scaled_df"],
@@ -114,17 +136,19 @@ def show_preprocessing():
 
     st.markdown("---")
 
-    st.subheader("📋 Data Setelah Cleaning")
+    st.subheader("📋 Dataset Setelah Cleaning")
 
     st.dataframe(
-        st.session_state["original_df"].head(10),
+        st.session_state["original_df"],
         use_container_width=True,
         hide_index=True
     )
 
     st.info(
-        "K-Means menggunakan empat variabel: "
-        "Total_harga, Jumlah_pesanan, "
-        "rata_rata_harga, dan waktu_persiapan_digunakan."
+        """
+        Dataset telah berhasil melalui proses preprocessing yang meliputi
+        pembersihan data (*data cleaning*) dan normalisasi menggunakan
+        **Min-Max Normalization** sehingga siap digunakan pada proses
+        K-Means Clustering.
+        """
     )
-
