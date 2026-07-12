@@ -196,3 +196,24 @@ def success_card(message):
         """,
         unsafe_allow_html=True
     )
+    # ==========================================================
+# ANALYSIS CARD
+# ==========================================================
+
+def analysis_card(title, content):
+    """
+    Card penjelasan hasil analisis cluster.
+    """
+
+    st.markdown(
+        f"""
+        <div class="analysis-card">
+
+            <h4>{title}</h4>
+
+            <p>{content}</p>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
