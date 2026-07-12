@@ -21,6 +21,14 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+import streamlit as st
+
+st.write("Streamlit Version:", st.__version__)
+
+st.markdown(
+    "<h1 style='color:red'>TEST HTML</h1>",
+    unsafe_allow_html=True
+)
 
 # ======================================================
 # LOAD CSS
