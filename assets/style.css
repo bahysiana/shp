@@ -518,3 +518,42 @@ button[role="tab"]{
     border-radius:20px;
 
 }
+/* ==========================================================
+   ANALYSIS CARD
+========================================================== */
+
+.analysis-card{
+
+    background:white;
+
+    border-left:6px solid #3B82F6;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
+
+    margin-bottom:20px;
+
+}
+
+.analysis-card h4{
+
+    color:#1F2937;
+
+    margin-bottom:12px;
+
+    font-size:18px;
+
+}
+
+.analysis-card p{
+
+    color:#4B5563;
+
+    line-height:1.8;
+
+    margin:0;
+
+}
