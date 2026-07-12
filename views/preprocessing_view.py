@@ -2,80 +2,247 @@ import streamlit as st
 import pandas as pd
 
 from utils.database import get_all_data
+
 from utils.preprocessing import (
     clean_dataframe,
     preprocess_data,
     get_feature_columns
 )
 
+from utils.components import (
+    section_title,
+    metric_card,
+    info_card,
+    success_card
+)
+
+
+# ==========================================================
+# HALAMAN PREPROCESSING
+# ==========================================================
 
 def show_preprocessing():
 
-    st.title("⚙️ Preprocessing Data")
+    # ======================================================
+    # HEADER
+    # ======================================================
 
-    st.write(
-        """
-        Tahap preprocessing dilakukan untuk membersihkan data dan
-        melakukan normalisasi menggunakan **Min-Max Normalization**
-        sebelum proses K-Means Clustering.
-        """
+    section_title(
+
+        "⚙️ Preprocessing Data",
+
+        "Melakukan proses pembersihan data (Data Cleaning) dan normalisasi menggunakan Min-Max Normalization sebelum proses K-Means Clustering."
+
     )
 
-    st.markdown("---")
+    st.divider()
 
-    # =====================================================
-    # AMBIL DATA
-    # =====================================================
+    # ======================================================
+    # INFORMASI
+    # ======================================================
+
+    info_card(
+
+        "Tentang Preprocessing",
+
+        """
+Tahap preprocessing bertujuan untuk mempersiapkan dataset agar siap
+digunakan pada proses clustering.
+
+Tahapan yang dilakukan meliputi:
+
+• Data Cleaning
+
+• Pemilihan Variabel Penelitian
+
+• Min-Max Normalization
+        """
+
+    )
+
+    st.divider()
+
+    # ======================================================
+    # AMBIL DATA DATABASE
+    # ======================================================
 
     df = get_all_data()
 
     if df.empty:
 
-        st.warning(
-            "Belum ada dataset. Silakan upload data terlebih dahulu."
+        info_card(
+
+            "Dataset Belum Tersedia",
+
+            """
+Belum terdapat dataset pada database.
+
+Silakan upload dataset terlebih dahulu melalui menu
+Kelola Data.
+            """
+
         )
 
         return
 
-    # =====================================================
-    # INFORMASI DATASET
-    # =====================================================
+    # ======================================================
+    # METRIC
+    # ======================================================
 
     col1, col2 = st.columns(2)
 
-    col1.metric(
-        "Jumlah Data",
-        len(df)
-    )
+    with col1:
 
-    col2.metric(
-        "Jumlah Variabel",
-        len(get_feature_columns())
-    )
+        metric_card(
 
-    st.markdown("---")
+            "Jumlah Data",
 
-    # =====================================================
+            len(df),
+
+            "📦"
+
+        )
+
+    with col2:
+
+        metric_card(
+
+            "Jumlah Variabel",
+
+            len(get_feature_columns()),
+
+            "📊"
+
+        )
+
+    st.divider()
+
+    # ======================================================
     # DATASET AWAL
-    # =====================================================
+    # ======================================================
 
-    st.subheader("📋 Dataset Sebelum Preprocessing")
+    section_title(
+
+        "📋 Dataset Sebelum Preprocessing",
+
+        "Dataset asli sebelum dilakukan proses cleaning dan normalisasi."
+
+    )
+
+    jumlah = st.selectbox(
+
+        "Jumlah Data",
+
+        [
+
+            10,
+
+            25,
+
+            50,
+
+            100
+
+        ],
+
+        index=0
+
+    )
+
+    keyword = st.text_input(
+
+        "🔍 Cari Data"
+
+    )
+
+    tampil = df.copy()
+
+    if keyword:
+
+        tampil = tampil[
+
+            tampil.astype(str)
+
+            .apply(
+
+                lambda x:
+
+                x.str.contains(
+
+                    keyword,
+
+                    case=False,
+
+                    na=False
+
+                )
+
+            )
+
+            .any(axis=1)
+
+        ]
 
     st.dataframe(
-        df,
+
+        tampil.head(jumlah),
+
         use_container_width=True,
+
         hide_index=True
+
     )
 
-    st.markdown("---")
+    st.divider()
 
-    # =====================================================
+    # ======================================================
+    # VARIABEL PENELITIAN
+    # ======================================================
+
+    section_title(
+
+        "📌 Variabel Penelitian",
+
+        "Variabel yang digunakan pada proses K-Means Clustering."
+
+    )
+
+    fitur_df = pd.DataFrame(
+
+        {
+
+            "Variabel":
+
+            get_feature_columns()
+
+        }
+
+    )
+
+    st.dataframe(
+
+        fitur_df,
+
+        use_container_width=True,
+
+        hide_index=True
+
+    )
+
+    st.divider()
+
+    # ======================================================
     # TOMBOL PREPROCESSING
-    # =====================================================
+    # ======================================================
 
     if st.button(
+
         "🚀 Proses Preprocessing",
-        use_container_width=True
+
+        use_container_width=True,
+
+        type="primary"
+
     ):
 
         try:
@@ -83,72 +250,223 @@ def show_preprocessing():
             cleaned_df = clean_dataframe(df)
 
             scaled_df, scaler = preprocess_data(
+
                 cleaned_df
+
             )
 
             st.session_state["original_df"] = cleaned_df
+
             st.session_state["scaled_df"] = scaled_df
+
             st.session_state["scaler"] = scaler
 
-            st.success(
-                "✅ Preprocessing berhasil dilakukan menggunakan Min-Max Normalization."
+            success_card(
+
+                "Preprocessing berhasil dilakukan menggunakan Min-Max Normalization."
+
             )
+
+            st.rerun()
 
         except Exception as e:
 
             st.error(
-                f"Terjadi kesalahan : {e}"
+
+                f"Terjadi kesalahan: {e}"
+
             )
 
             return
 
-    # =====================================================
-    # HASIL
-    # =====================================================
+    # ======================================================
+    # VALIDASI
+    # ======================================================
 
     if "scaled_df" not in st.session_state:
 
         return
 
-    st.markdown("---")
+    st.divider()
+        # ======================================================
+    # DATASET SETELAH CLEANING
+    # ======================================================
 
-    st.subheader("📌 Variabel Penelitian")
+    section_title(
 
-    fitur_df = pd.DataFrame({
-        "Variabel Penelitian": get_feature_columns()
-    })
+        "🧹 Dataset Setelah Data Cleaning",
 
-    st.dataframe(
-        fitur_df,
-        use_container_width=True,
-        hide_index=True
+        "Dataset yang telah dibersihkan dan siap untuk proses normalisasi."
+
     )
 
-    st.markdown("---")
+    cleaned_df = st.session_state["original_df"]
 
-    st.subheader("📊 Dataset Setelah Min-Max Normalization")
+    jumlah_clean = st.selectbox(
 
-    st.dataframe(
-        st.session_state["scaled_df"],
-        use_container_width=True,
-        hide_index=True
+        "Jumlah Data Setelah Cleaning",
+
+        [
+
+            10,
+
+            25,
+
+            50,
+
+            100
+
+        ],
+
+        index=0,
+
+        key="clean_rows"
+
     )
 
-    st.markdown("---")
-
-    st.subheader("📋 Dataset Setelah Cleaning")
-
     st.dataframe(
-        st.session_state["original_df"],
+
+        cleaned_df.head(jumlah_clean),
+
         use_container_width=True,
+
         hide_index=True
+
     )
 
-    st.info(
+    st.divider()
+
+    # ======================================================
+    # DATASET HASIL NORMALISASI
+    # ======================================================
+
+    section_title(
+
+        "📊 Dataset Setelah Min-Max Normalization",
+
+        "Nilai setiap variabel telah dinormalisasi ke rentang 0 sampai 1."
+
+    )
+
+    scaled_df = st.session_state["scaled_df"]
+
+    jumlah_scaled = st.selectbox(
+
+        "Jumlah Data Hasil Normalisasi",
+
+        [
+
+            10,
+
+            25,
+
+            50,
+
+            100
+
+        ],
+
+        index=0,
+
+        key="scaled_rows"
+
+    )
+
+    st.dataframe(
+
+        scaled_df.head(jumlah_scaled),
+
+        use_container_width=True,
+
+        hide_index=True
+
+    )
+
+    st.divider()
+
+    # ======================================================
+    # RINGKASAN PREPROCESSING
+    # ======================================================
+
+    section_title(
+
+        "📋 Ringkasan Preprocessing"
+
+    )
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+
+        metric_card(
+
+            "Data Cleaning",
+
+            "Selesai",
+
+            "🧹"
+
+        )
+
+    with col2:
+
+        metric_card(
+
+            "Normalisasi",
+
+            "Min-Max",
+
+            "📊"
+
+        )
+
+    with col3:
+
+        metric_card(
+
+            "Status",
+
+            "Siap",
+
+            "✅"
+
+        )
+
+    st.divider()
+
+    # ======================================================
+    # INFORMASI HASIL
+    # ======================================================
+
+    info_card(
+
+        "Hasil Preprocessing",
+
         """
-        Dataset telah berhasil melalui proses preprocessing yang meliputi
-        pembersihan data (*data cleaning*) dan normalisasi menggunakan
-        **Min-Max Normalization** sehingga siap digunakan pada proses
-        K-Means Clustering.
+Dataset telah berhasil melalui seluruh tahapan preprocessing.
+
+Tahapan yang dilakukan meliputi:
+
+• Pembersihan data (Data Cleaning)
+
+• Pemilihan variabel penelitian
+
+• Min-Max Normalization
+
+Dataset hasil preprocessing telah disimpan ke dalam session aplikasi
+dan siap digunakan pada proses K-Means Clustering.
         """
+
+    )
+
+    st.divider()
+
+    # ======================================================
+    # STATUS
+    # ======================================================
+
+    success_card(
+
+        "Preprocessing selesai. Dataset siap digunakan pada menu Clustering."
+
     )
