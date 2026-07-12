@@ -46,9 +46,9 @@ def create_table():
 
             Jumlah_pesanan INTEGER,
 
-            rata_rata_harga REAL,
+            Jumlah_jenis_menu INTEGER,
 
-            waktu_persiapan_yang_diberikan TEXT,
+            waktu_persiapan_yang_diberikan INTEGER,
 
             waktu_persiapan_digunakan REAL,
 
@@ -156,7 +156,77 @@ def delete_all_data():
 
 
 # =====================================================
-# INISIALISASI
+# HAPUS BERDASARKAN NOMOR
+# =====================================================
+
+def delete_by_no(no):
+
+    conn = get_connection()
+
+    try:
+
+        conn.execute(
+            "DELETE FROM transaksi WHERE no=?",
+            (no,)
+        )
+
+        conn.commit()
+
+    finally:
+
+        conn.close()
+
+
+# =====================================================
+# TOTAL DATA
+# =====================================================
+
+def get_total_data():
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM transaksi"
+    )
+
+    total = cursor.fetchone()[0]
+
+    conn.close()
+
+    return total
+
+
+# =====================================================
+# TOTAL OMZET
+# =====================================================
+
+def get_total_omzet():
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT IFNULL(
+            SUM(Total_harga),
+            0
+        )
+        FROM transaksi
+        """
+    )
+
+    total = cursor.fetchone()[0]
+
+    conn.close()
+
+    return total
+
+
+# =====================================================
+# INISIALISASI DATABASE
 # =====================================================
 
 create_table()
