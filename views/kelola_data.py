@@ -15,7 +15,7 @@ from utils.components import (
 )
 
 # ==========================================================
-# KOLOM DATASET MENTAH
+# KOLOM WAJIB DATASET MENTAH
 # ==========================================================
 
 REQUIRED_COLUMNS = [
@@ -57,10 +57,6 @@ def show_kelola_data():
 
     st.divider()
 
-    # ======================================================
-    # INFORMASI
-    # ======================================================
-
     info_card(
 
         "Informasi Dataset",
@@ -77,18 +73,15 @@ Format file yang didukung :
 Silakan upload dataset transaksi Shopee Food
 dalam bentuk data mentah.
 
-Tahap Data Cleaning, Feature Engineering,
-dan Min-Max Normalization dilakukan
-pada menu Preprocessing.
+Tahap Data Cleaning,
+Feature Engineering,
+dan Min-Max Normalization
+akan dilakukan pada menu Preprocessing.
         """
 
     )
 
     st.divider()
-
-    # ======================================================
-    # UPLOAD DATASET
-    # ======================================================
 
     uploaded_file = st.file_uploader(
 
@@ -106,17 +99,13 @@ pada menu Preprocessing.
 
     )
 
-    if uploaded_file is None:
-
-        st.divider()
-
-    else:
+    if uploaded_file is not None:
 
         try:
 
-            # ==================================================
+            # ============================================
             # MEMBACA FILE
-            # ==================================================
+            # ============================================
 
             if uploaded_file.name.lower().endswith(".csv"):
 
@@ -140,21 +129,15 @@ pada menu Preprocessing.
 
                 df = pd.read_excel(uploaded_file)
 
-            # ==================================================
+            # ============================================
             # MEMBERSIHKAN NAMA KOLOM
-            # ==================================================
+            # ============================================
 
-            df.columns = (
+            df.columns = df.columns.str.strip()
 
-                df.columns
-
-                .str.strip()
-
-            )
-
-            # ==================================================
+            # ============================================
             # VALIDASI KOLOM
-            # ==================================================
+            # ============================================
 
             missing = [
 
@@ -166,7 +149,7 @@ pada menu Preprocessing.
 
             ]
 
-            if len(missing) > 0:
+            if missing:
 
                 st.error(
 
@@ -176,7 +159,7 @@ pada menu Preprocessing.
 
                 st.write(
 
-                    "Kolom yang belum tersedia :"
+                    "Kolom yang belum tersedia:"
 
                 )
 
@@ -187,9 +170,10 @@ pada menu Preprocessing.
                 )
 
                 return
-                            # ==================================================
-            # MEMBERSIHKAN KOLOM TOTAL HARGA
-            # ==================================================
+
+            # ============================================
+            # MEMBERSIHKAN TOTAL HARGA
+            # ============================================
 
             df["Total_harga"] = (
 
@@ -214,10 +198,9 @@ pada menu Preprocessing.
                 errors="coerce"
 
             ).fillna(0)
-
-            # ==================================================
+                        # ============================================
             # INFORMASI DATASET
-            # ==================================================
+            # ============================================
 
             st.success(
 
@@ -265,9 +248,9 @@ pada menu Preprocessing.
 
             st.divider()
 
-            # ==================================================
-            # PENCARIAN DATASET
-            # ==================================================
+            # ============================================
+            # PENCARIAN DATA
+            # ============================================
 
             keyword = st.text_input(
 
@@ -341,41 +324,49 @@ pada menu Preprocessing.
 
             st.divider()
 
-            # ==================================================
+            # ============================================
             # SIMPAN DATASET
-            # ==================================================
+            # ============================================
 
             if st.button(
 
                 "💾 Simpan Dataset",
 
-                type="primary",
+                use_container_width=True,
 
-                use_container_width=True
+                type="primary"
 
             ):
 
-                replace_all_data(df)
+                replace_all_data(
+
+                    df
+
+                )
 
                 st.success(
 
                     """
 Dataset mentah berhasil disimpan.
 
-Silakan lanjut ke menu **Preprocessing**
-untuk melakukan:
+Silakan lanjut ke menu **Preprocessing** untuk melakukan:
 
 • Data Cleaning
 
 • Feature Engineering
 
 • Min-Max Normalization
+
+Setelah preprocessing selesai,
+dataset siap digunakan
+pada proses Clustering.
                     """
 
                 )
 
                 st.rerun()
-                        except Exception as e:
+
+        except Exception as e:
 
             st.error(
 
@@ -384,9 +375,8 @@ untuk melakukan:
             )
 
     st.divider()
-
-    # ======================================================
-    # DATA DALAM DATABASE
+        # ======================================================
+    # DATASET DALAM DATABASE
     # ======================================================
 
     db = get_all_data()
@@ -395,7 +385,7 @@ untuk melakukan:
 
         "🗃 Dataset Dalam Database",
 
-        "Dataset mentah yang telah tersimpan."
+        "Data mentah yang telah tersimpan."
 
     )
 
@@ -541,6 +531,8 @@ Silakan upload dataset terlebih dahulu.
 
         ],
 
+        index=0,
+
         key="jumlah_database"
 
     )
@@ -562,9 +554,8 @@ Silakan upload dataset terlebih dahulu.
     )
 
     st.divider()
-
-    # ======================================================
-    # HAPUS DATA
+        # ======================================================
+    # HAPUS DATASET
     # ======================================================
 
     warning_card(
@@ -572,7 +563,8 @@ Silakan upload dataset terlebih dahulu.
         "Perhatian",
 
         """
-Seluruh dataset yang tersimpan akan dihapus.
+Seluruh dataset yang tersimpan akan dihapus
+dari database.
 
 Proses ini tidak dapat dibatalkan.
         """
@@ -591,17 +583,61 @@ Proses ini tidak dapat dibatalkan.
 
             "🗑 Hapus Seluruh Dataset",
 
-            use_container_width=True
+            use_container_width=True,
+
+            type="secondary",
+
+            key="hapus_dataset"
 
         ):
 
-            delete_all_data()
+            try:
 
-            st.success(
+                delete_all_data()
 
-                "Dataset berhasil dihapus."
+                # Menghapus session preprocessing
+                for key in [
 
-            )
+                    "original_df",
 
-            st.rerun()
-            
+                    "scaled_df",
+
+                    "scaler",
+
+                    "hasil_cluster",
+
+                    "summary_cluster",
+
+                    "cluster_statistics",
+
+                    "cluster_information"
+
+                ]:
+
+                    if key in st.session_state:
+
+                        del st.session_state[key]
+
+                st.success(
+
+                    "✅ Seluruh dataset berhasil dihapus."
+
+                )
+
+                st.rerun()
+
+            except Exception as e:
+
+                st.error(
+
+                    f"Gagal menghapus dataset : {e}"
+
+                )
+
+    else:
+
+        st.info(
+
+            "Centang konfirmasi terlebih dahulu apabila ingin menghapus seluruh dataset."
+
+        )
