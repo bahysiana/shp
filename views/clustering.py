@@ -36,88 +36,129 @@ def show_clustering():
     # ======================================================
 
     section_title(
+
         "📊 Clustering",
-        "Melakukan pengelompokan transaksi Shopee Food untuk membantu menentukan prioritas pelayanan pada Toko Buffet The Padang Pasir."
+
+        "Melakukan proses pengelompokan transaksi Shopee Food menggunakan metode K-Means Clustering berdasarkan karakteristik beban pelayanan."
+
     )
 
     info_card(
+
         "Informasi",
-        "Tekan tombol 'Mulai Clustering' untuk mengelompokkan transaksi berdasarkan karakteristik beban pelayanan."
+
+        """
+Klik tombol **Mulai Clustering** untuk melakukan proses
+pengelompokan transaksi.
+
+Hasil clustering akan digunakan sebagai dasar dalam
+menentukan prioritas pelayanan pada Toko Buffet The Padang Pasir.
+        """
+
     )
 
     st.divider()
 
     # ======================================================
-    # VALIDASI
+    # VALIDASI PREPROCESSING
     # ======================================================
 
     if "scaled_df" not in st.session_state:
 
-        st.warning(
-            "Silakan lakukan proses preprocessing terlebih dahulu."
+        info_card(
+
+            "Preprocessing Belum Dilakukan",
+
+            """
+Dataset belum melalui proses preprocessing.
+
+Silakan lakukan preprocessing terlebih dahulu
+melalui menu **Preprocessing**.
+            """
+
         )
 
         return
 
     scaled_df = st.session_state["scaled_df"]
+
     original_df = st.session_state["original_df"]
 
     # ======================================================
-    # BUTTON PROSES
+    # PROSES CLUSTERING
     # ======================================================
 
     if st.button(
-        "🔍 Mulai Clustering",
+
+        "🚀 Mulai Clustering",
+
         use_container_width=True,
+
         type="primary"
+
     ):
 
         with st.spinner(
-            "Sedang melakukan proses clustering..."
+
+            "Sedang menjalankan algoritma K-Means..."
+
         ):
 
             model, labels, centroid = run_kmeans(
+
                 scaled_df
+
             )
 
             hasil = add_cluster_result(
+
                 original_df,
+
                 labels
+
             )
 
             hasil = add_cluster_label(
+
                 hasil,
+
                 centroid
+
             )
 
             summary = cluster_summary(
+
                 hasil
+
             )
 
             statistik = cluster_statistics(
+
                 hasil
+
             )
 
             st.session_state["hasil_cluster"] = hasil
+
             st.session_state["summary_cluster"] = summary
+
             st.session_state["cluster_statistics"] = statistik
+
             st.session_state["centroid"] = centroid
 
-        st.success(
+        success_card(
+
             "Proses clustering berhasil dilakukan."
+
         )
 
         st.rerun()
 
     # ======================================================
-    # BELUM ADA HASIL
+    # VALIDASI HASIL
     # ======================================================
 
     if "hasil_cluster" not in st.session_state:
-
-        st.info(
-            "Belum ada hasil clustering."
-        )
 
         return
 
@@ -128,23 +169,25 @@ def show_clustering():
     statistik = st.session_state["cluster_statistics"]
 
     info_cluster = get_cluster_information(
+
         summary
+
     )
 
     interpretasi = get_cluster_interpretation()
+
+    st.divider()
+        # ======================================================
+    # RINGKASAN HASIL
+    # ======================================================
 
     success_card(
         "Analisis transaksi berhasil dilakukan."
     )
 
-    st.divider()
-
-    # ======================================================
-    # RINGKASAN
-    # ======================================================
-
     section_title(
-        "📦 Ringkasan Hasil"
+        "📦 Ringkasan Hasil",
+        "Informasi umum hasil pengelompokan transaksi."
     )
 
     col1, col2 = st.columns(2)
@@ -210,24 +253,34 @@ def show_clustering():
             r=10,
             t=10,
             b=10
-        )
+        ),
+
+        paper_bgcolor="white",
+
+        plot_bgcolor="white"
 
     )
 
     st.plotly_chart(
+
         fig,
+
         use_container_width=True
+
     )
 
     st.divider()
 
     # ======================================================
-    # HASIL CLUSTER
+    # RINGKASAN CLUSTER
     # ======================================================
 
     section_title(
-        "📌 Ringkasan Hasil Clustering",
+
+        "📌 Ringkasan Cluster",
+
         "Hasil pengelompokan transaksi berdasarkan karakteristik beban pelayanan."
+
     )
 
     col1, col2 = st.columns(2)
@@ -240,7 +293,7 @@ def show_clustering():
 
             "Pola Transaksi dengan Beban Pelayanan Tinggi",
 
-            info_cluster["tinggi"]["jumlah"]
+            f"{info_cluster['tinggi']['jumlah']} Transaksi"
 
         )
 
@@ -252,7 +305,7 @@ def show_clustering():
 
             "Pola Transaksi dengan Beban Pelayanan Rendah",
 
-            info_cluster["rendah"]["jumlah"]
+            f"{info_cluster['rendah']['jumlah']} Transaksi"
 
         )
 
@@ -262,8 +315,11 @@ def show_clustering():
     # ======================================================
 
     section_title(
+
         "💡 Penjelasan Hasil Clustering",
-        "Penjelasan sederhana mengenai karakteristik setiap cluster."
+
+        "Karakteristik masing-masing cluster berdasarkan hasil analisis."
+
     )
 
     col1, col2 = st.columns(2)
@@ -272,7 +328,7 @@ def show_clustering():
 
         analysis_card(
 
-            f"📌 {info_cluster['tinggi']['cluster']}",
+            "📌 Pola Transaksi dengan Beban Pelayanan Tinggi",
 
             interpretasi["tinggi"]["description"]
 
@@ -282,7 +338,7 @@ def show_clustering():
 
         analysis_card(
 
-            f"📌 {info_cluster['rendah']['cluster']}",
+            "📌 Pola Transaksi dengan Beban Pelayanan Rendah",
 
             interpretasi["rendah"]["description"]
 
@@ -295,7 +351,9 @@ def show_clustering():
     # ======================================================
 
     section_title(
+
         "📋 Kesimpulan Hasil Clustering"
+
     )
 
     info_card(
@@ -309,193 +367,23 @@ def show_clustering():
     st.divider()
 
     # ======================================================
-    # REKOMENDASI
+    # REKOMENDASI OPERASIONAL
     # ======================================================
 
     section_title(
-        "💼 Rekomendasi",
-        "Saran yang dapat diterapkan berdasarkan hasil clustering."
+
+        "💼 Rekomendasi Operasional",
+
+        "Saran yang dapat diterapkan berdasarkan hasil analisis clustering."
+
     )
 
     recommendation_card(
 
-        "Rekomendasi Operasional",
+        "Rekomendasi",
 
         interpretasi["rekomendasi"]
 
     )
 
     st.divider()
-
-    # ======================================================
-    # KARAKTERISTIK CLUSTER
-    # ======================================================
-
-    section_title(
-        "📈 Karakteristik Tiap Cluster",
-        "Nilai rata-rata setiap variabel pada masing-masing cluster."
-    )
-
-    statistik_tampil = statistik.copy()
-
-    statistik_tampil = statistik_tampil.rename(
-
-        columns={
-
-            "Nama Cluster": "Cluster",
-
-            "Total_harga": "Total Harga",
-
-            "Jumlah_pesanan": "Jumlah Pesanan",
-
-            "Jumlah_jenis_menu": "Jumlah Jenis Menu",
-
-            "waktu_persiapan_yang_diberikan":
-                "Estimasi Persiapan (Menit)",
-
-            "waktu_persiapan_digunakan":
-                "Waktu Persiapan (Menit)"
-
-        }
-
-    )
-
-    st.dataframe(
-
-        statistik_tampil,
-
-        use_container_width=True,
-
-        hide_index=True
-
-    )
-
-    st.divider()
-        # ======================================================
-    # DETAIL DATA TRANSAKSI
-    # ======================================================
-
-    section_title(
-        "📄 Detail Data Transaksi",
-        "Menampilkan data transaksi beserta hasil cluster."
-    )
-
-    col1, col2 = st.columns([3, 1])
-
-    with col1:
-
-        keyword = st.text_input(
-            "🔍 Cari Username atau Menu",
-            placeholder="Masukkan username atau nama menu..."
-        )
-
-    with col2:
-
-        jumlah_data = st.selectbox(
-            "Tampilkan",
-            [10, 25, 50, 100],
-            index=0
-        )
-
-    hasil_tampil = hasil.copy()
-
-    # ======================================================
-    # FILTER DATA
-    # ======================================================
-
-    if keyword:
-
-        keyword = keyword.lower()
-
-        kolom_pencarian = []
-
-        if "username" in hasil_tampil.columns:
-            kolom_pencarian.append("username")
-
-        if "menu_yang_dibeli" in hasil_tampil.columns:
-            kolom_pencarian.append("menu_yang_dibeli")
-
-        if kolom_pencarian:
-
-            mask = False
-
-            for kolom in kolom_pencarian:
-
-                mask = (
-                    mask
-                    |
-                    hasil_tampil[kolom]
-                    .astype(str)
-                    .str.lower()
-                    .str.contains(
-                        keyword,
-                        na=False
-                    )
-                )
-
-            hasil_tampil = hasil_tampil[mask]
-
-    # ======================================================
-    # INFORMASI DATA
-    # ======================================================
-
-    st.caption(
-        f"Menampilkan **{min(len(hasil_tampil), jumlah_data)}** dari **{len(hasil_tampil)}** transaksi."
-    )
-
-    # ======================================================
-    # TABEL HASIL
-    # ======================================================
-
-    urutan_kolom = [
-
-        "no",
-
-        "username",
-
-        "menu_yang_dibeli",
-
-        "Total_harga",
-
-        "Jumlah_pesanan",
-
-        "Jumlah_jenis_menu",
-
-        "waktu_persiapan_yang_digunakan",
-
-        "Cluster",
-
-        "Nama Cluster"
-
-    ]
-
-    kolom_tampil = [
-
-        kolom
-
-        for kolom in urutan_kolom
-
-        if kolom in hasil_tampil.columns
-
-    ]
-
-    st.dataframe(
-
-        hasil_tampil[kolom_tampil]
-        .head(jumlah_data),
-
-        use_container_width=True,
-
-        hide_index=True
-
-    )
-
-    st.divider()
-
-    # ======================================================
-    # INFORMASI AKHIR
-    # ======================================================
-
-    success_card(
-        "Proses clustering selesai. Hasil analisis dapat diunduh melalui menu Download."
-    )
