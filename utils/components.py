@@ -77,3 +77,39 @@ def info_card(title, content):
         """,
         unsafe_allow_html=True
     )
+    # ==========================================================
+# HERO CARD
+# ==========================================================
+
+def hero_card(title, subtitle):
+
+    st.markdown(
+        f"""
+        <div style="
+            background:linear-gradient(90deg,#EE4D2D,#FF7A59);
+            padding:30px;
+            border-radius:18px;
+            color:white;
+            margin-bottom:20px;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
+        ">
+
+            <h2 style="
+                margin:0;
+                color:white;
+            ">
+                {title}
+            </h2>
+
+            <p style="
+                margin-top:10px;
+                color:white;
+                font-size:16px;
+            ">
+                {subtitle}
+            </p>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
